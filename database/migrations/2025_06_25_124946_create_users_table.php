@@ -17,11 +17,14 @@ return new class extends Migration
             $table->string('password');
             $table->string('name', 100)->nullable();
             $table->string('phone', 20)->nullable()->unique();
+            $table->string('email_verified_at')->nullable();
+            $table->string('phone_verified_at')->nullable();
             $table->boolean('is_blocked')->default(false);
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('email');
+            $table->index('phone');
         });
     }
 
