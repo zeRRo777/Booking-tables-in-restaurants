@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
  */
 class UserFactory extends Factory
 {
+
+    protected static ?string $password;
+
     /**
      * Define the model's default state.
      *
@@ -19,7 +22,7 @@ class UserFactory extends Factory
     {
         return [
             'email' => fake()->unique()->safeEmail(),
-            'password' => Hash::make('password'),
+            'password' => static::$password ??= Hash::make('password'),
             'name' => fake()->name(),
             'phone' => fake()->unique()->phoneNumber(),
             'email_verified_at' => now(),
@@ -32,6 +35,20 @@ class UserFactory extends Factory
     {
         return $this->state(fn(array $attributes) => [
             'is_blocked' => true,
+        ]);
+    }
+
+    public function unverifiedEmail(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+
+    public function unverifiedPhone(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'phone_verified_at' => null,
         ]);
     }
 }

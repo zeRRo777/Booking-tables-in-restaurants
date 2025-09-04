@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\RestaurantChainFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Reservation_statuse extends Model
+class RestaurantChain extends Model
 {
     use SoftDeletes;
 }

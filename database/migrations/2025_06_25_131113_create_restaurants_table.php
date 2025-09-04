@@ -19,12 +19,16 @@ return new class extends Migration
             $table->string('address', 100)->unique();
             $table->string('type_kitchen', 100)->nullable();
             $table->string('price_range', 20)->nullable();
-            $table->time('weekdays_opens_at');
-            $table->time('weekdays_closes_at');
-            $table->time('weekend_opens_at');
-            $table->time('weekend_closes_at');
+            $table->time('weekdays_opens_at')->nullable();
+            $table->time('weekdays_closes_at')->nullable();
+            $table->time('weekend_opens_at')->nullable();
+            $table->time('weekend_closes_at')->nullable();
             $table->string('cancellation_policy')->nullable();
-            $table->foreignIdFor(Restaurant_chain::class)->constrained()->nullOnDelete();
+            $table->foreignId('restaurant_chain_id')
+                ->nullable()
+                ->constrained('restaurant_chains', 'id')
+                ->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
 

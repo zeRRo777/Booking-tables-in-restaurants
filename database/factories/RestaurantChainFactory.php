@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Restaurant_chain;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class RestaurantChainFactory extends Factory
 {
+    protected $model = Restaurant_chain::class;
     /**
      * Define the model's default state.
      *

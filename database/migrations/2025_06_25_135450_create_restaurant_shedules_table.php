@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->date('date');
-            $table->time('opens_at');
-            $table->time('closes_at');
+            $table->time('opens_at')->nullable();
+            $table->time('closes_at')->nullable();
             $table->boolean('is_closed')->default(false);
             $table->string('description')->nullable();
             $table->timestamps();

@@ -1,11 +1,11 @@
 services:
     laravel.test:
         build:
-            context: './docker/8.4'
+            context: ./docker/8.4
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'booking_tables'
+        image: booking_tables
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
