@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\RestaurantChainFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RestaurantChain extends Model
@@ -16,5 +17,10 @@ class RestaurantChain extends Model
     public function superAdmins(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'chain_super_admins');
+    }
+
+    public function restaurants(): HasMany
+    {
+        return $this->hasMany(Restaurant::class);
     }
 }
