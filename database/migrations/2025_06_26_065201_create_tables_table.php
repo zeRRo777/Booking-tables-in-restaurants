@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['number', 'restaurant_id']);
         });
     }
 

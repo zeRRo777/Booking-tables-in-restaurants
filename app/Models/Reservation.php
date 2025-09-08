@@ -31,4 +31,19 @@ class Reservation extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function table(): BelongsTo
+    {
+        return $this->belongsTo(Table::class);
+    }
+
+    public function restaurant(): BelongsTo
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
+
+    public function reminderType(): BelongsTo
+    {
+        return $this->belongsTo(ReminderType::class);
+    }
 }

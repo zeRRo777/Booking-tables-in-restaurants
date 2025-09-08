@@ -60,4 +60,9 @@ class User extends Model
     {
         return $this->belongsToMany(Role::class, 'user_roles');
     }
+
+    public function blockedUsers(): HasMany
+    {
+        return $this->hasMany(User::class, 'blocked_by');
+    }
 }

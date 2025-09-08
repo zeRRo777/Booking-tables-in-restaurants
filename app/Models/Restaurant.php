@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Restaurant extends Model
@@ -34,5 +36,40 @@ class Restaurant extends Model
     public function administrators(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'restaurant_admins');
+    }
+
+    public function occupancyStats(): HasMany
+    {
+        return $this->hasMany(OccupancyStat::class);
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(RestaurantShedule::class);
+    }
+
+    public function tables(): HasMany
+    {
+        return $this->hasMany(Table::class);
+    }
+
+    public function usersStatuses(): HasMany
+    {
+        return $this->hasMany(UserRestaurantStatuse::class);
+    }
+
+    public function chain(): BelongsTo
+    {
+        return $this->belongsTo(RestaurantChain::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
     }
 }

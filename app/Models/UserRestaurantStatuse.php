@@ -10,6 +10,10 @@ class UserRestaurantStatuse extends Model
 {
     use SoftDeletes;
 
+    protected $primaryKey = ['user_id', 'restaurant_id'];
+
+    public $incrementing = false;
+
     protected $fillable = [
         'user_id',
         'restaurant_id',
