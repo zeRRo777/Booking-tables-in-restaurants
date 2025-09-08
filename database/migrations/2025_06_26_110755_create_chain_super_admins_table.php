@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Restaurant_chain;
+use App\Models\RestaurantChain;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -15,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('chain_super_admins', function (Blueprint $table) {
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Restaurant_chain::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(RestaurantChain::class)->constrained()->cascadeOnDelete();
             $table->primary(['user_id', 'restaurant_chain_id']);
         });
     }

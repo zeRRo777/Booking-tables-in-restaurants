@@ -3,9 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = [
+        'user_id',
+        'table_id',
+        'restaurant_id',
+        'count_people',
+        'special_wish',
+        'status_id',
+        'date_start',
+        'date_end',
+        'reminder_type_id'
+    ];
+
+    protected $casts = [
+        'date_start' => 'datetime',
+        'date_end' => 'datetime'
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

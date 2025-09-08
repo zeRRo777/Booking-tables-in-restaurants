@@ -4,9 +4,17 @@ namespace App\Models;
 
 use Database\Factories\RestaurantChainFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RestaurantChain extends Model
 {
     use SoftDeletes;
+
+    protected $fillable = ['name'];
+
+    public function superAdmins(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'chain_super_admins');
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Reminder_type;
+use App\Models\ReminderType;
 use App\Models\Restaurant;
 use App\Models\Table;
 use App\Models\User;
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->foreignId('status_id')->constrained('reservation_statuses', 'id');
             $table->timestamp('date_start');
             $table->timestamp('date_end');
-            $table->foreignIdFor(Reminder_type::class)->constrained()->nullOnDelete();
+            $table->foreignIdFor(ReminderType::class)->constrained()->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
 
