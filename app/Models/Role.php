@@ -10,6 +10,10 @@ class Role extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'name'
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_roles');

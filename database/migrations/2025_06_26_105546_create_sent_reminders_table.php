@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Reminder_type;
+use App\Models\ReminderType;
 use App\Models\Reservation;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,12 +17,12 @@ return new class extends Migration
         Schema::create('sent_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Reservation::class)->constrained()->cascadeOnDelete();
-            $table->timestampTz('sent_at');
+            $table->timestamp('sent_at');
             $table->string('recipient_email', 50);
-            $table->foreignIdFor(Reminder_type::class)->constrained();
+            $table->foreignIdFor(ReminderType::class)->constrained();
             $table->string('status', 20);
             $table->text('error_message')->nullable();
-            $table->timestampTz('created_at');
+            $table->timestamp('created_at');
         });
     }
 

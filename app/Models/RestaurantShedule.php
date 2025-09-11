@@ -14,7 +14,14 @@ class RestaurantShedule extends Model
 
     public $incrementing = false;
 
-    protected $fillable = ['restaurant_id', 'date', 'opens_at', 'closes_at', 'is_closed', 'description'];
+    protected $fillable = [
+        'restaurant_id',
+        'date',
+        'opens_at',
+        'closes_at',
+        'is_closed',
+        'description'
+    ];
 
     protected $casts = [
         'date' => 'date',

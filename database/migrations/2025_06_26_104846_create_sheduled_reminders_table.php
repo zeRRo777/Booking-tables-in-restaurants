@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Reminder_type;
+use App\Models\ReminderType;
 use App\Models\Reservation;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,11 +17,11 @@ return new class extends Migration
         Schema::create('sheduled_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Reservation::class)->constrained()->cascadeOnDelete();
-            $table->timestampTz('execute_at');
-            $table->foreignIdFor(Reminder_type::class)->constrained();
+            $table->timestamp('execute_at');
+            $table->foreignIdFor(ReminderType::class)->constrained();
             $table->smallInteger('attempts')->default(0);
             $table->string('status', 20)->default('pending');
-            $table->timestampsTz();
+            $table->timestamps();
 
             $table->index('execute_at');
         });
