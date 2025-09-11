@@ -14,9 +14,9 @@ return new class extends Migration
     {
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
-            $table->integer('number');
-            $table->integer('capacity_min');
-            $table->integer('capacity_max');
+            $table->unsignedTinyInteger('number');
+            $table->unsignedTinyInteger('capacity_min');
+            $table->unsignedTinyInteger('capacity_max');
             $table->string('zone')->nullable();
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->timestamps();

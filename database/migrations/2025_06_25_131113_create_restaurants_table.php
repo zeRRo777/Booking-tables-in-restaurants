@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->string('address', 100)->unique();
             $table->string('type_kitchen', 100)->nullable();
             $table->string('price_range', 20)->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->time('weekdays_closes_at')->nullable();
             $table->time('weekend_opens_at')->nullable();
             $table->time('weekend_closes_at')->nullable();
-            $table->string('cancellation_policy')->nullable();
+            $table->text('cancellation_policy')->nullable();
             $table->foreignId('restaurant_chain_id')
                 ->nullable()
                 ->constrained('restaurant_chains', 'id')

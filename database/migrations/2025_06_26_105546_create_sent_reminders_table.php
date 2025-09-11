@@ -17,12 +17,11 @@ return new class extends Migration
         Schema::create('sent_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Reservation::class)->constrained()->cascadeOnDelete();
-            $table->timestamp('sent_at');
             $table->string('recipient_email', 50);
             $table->foreignIdFor(ReminderType::class)->constrained();
             $table->string('status', 20);
             $table->text('error_message')->nullable();
-            $table->timestamp('created_at');
+            $table->timestamps();
         });
     }
 

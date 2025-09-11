@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sheduled_reminders', function (Blueprint $table) {
+        Schema::create('scheduled_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Reservation::class)->constrained()->cascadeOnDelete();
             $table->timestamp('execute_at');

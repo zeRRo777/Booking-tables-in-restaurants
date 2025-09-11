@@ -22,10 +22,10 @@ return new class extends Migration
             $table->foreignIdFor(Table::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->integer('count_people');
-            $table->string('special_wish')->nullable();
+            $table->text('special_wish')->nullable();
             $table->foreignId('status_id')->constrained('reservation_statuses', 'id');
-            $table->timestamp('date_start');
-            $table->timestamp('date_end');
+            $table->timestamp('starts_at');
+            $table->timestamp('ends_at');
             $table->foreignIdFor(ReminderType::class)->constrained()->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

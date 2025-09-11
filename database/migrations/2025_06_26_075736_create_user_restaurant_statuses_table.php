@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->boolean('is_blocked')->default(false);
-            $table->string('block_reason');
+            $table->text('block_reason');
             $table->foreignId('blocked_by')->constrained('users', 'id')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

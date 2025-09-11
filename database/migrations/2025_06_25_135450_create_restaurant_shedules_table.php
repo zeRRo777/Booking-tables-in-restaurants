@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('restaurant_shedules', function (Blueprint $table) {
+        Schema::create('restaurant_schedules', function (Blueprint $table) {
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->time('opens_at')->nullable();

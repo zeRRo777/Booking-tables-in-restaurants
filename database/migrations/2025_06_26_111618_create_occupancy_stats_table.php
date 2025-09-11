@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('occupancy_stats', function (Blueprint $table) {
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
             $table->date('date');
-            $table->smallInteger('hour');
-            $table->smallInteger('occupacity_percent');
+            $table->unsignedTinyInteger('hour');
+            $table->unsignedTinyInteger('occupacity_percent');
             $table->primary(['restaurant_id', 'date', 'hour']);
         });
     }
