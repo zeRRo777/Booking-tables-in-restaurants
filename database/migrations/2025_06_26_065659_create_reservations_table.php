@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['restaurant_id', 'date_start']);
+            $table->index(['restaurant_id', 'starts_at']);
             $table->index(['user_id', 'created_at']);
         });
     }
