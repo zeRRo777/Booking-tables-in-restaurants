@@ -2,15 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Restaurant_chain;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Restaurant_chain>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RestaurantChain>
  */
 class RestaurantChainFactory extends Factory
 {
-    protected $model = Restaurant_chain::class;
     /**
      * Define the model's default state.
      *
@@ -19,7 +17,7 @@ class RestaurantChainFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->company() . ' Chain',
+            'name' => $this->faker->unique()->company() . ' Group',
         ];
     }
 }

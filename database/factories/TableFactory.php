@@ -17,14 +17,14 @@ class TableFactory extends Factory
      */
     public function definition(): array
     {
-        $min = fake()->numberBetween(2, 4);
-        $max = $min + fake()->numberBetween(1, 4);
+        $min = $this->faker->randomElement([2, 4, 6]);
+        $max = $min + $this->faker->randomElement([0, 2]);
 
         return [
-            'number' => fake()->unique()->numberBetween(1, 50),
+            'number' => fake()->numberBetween(1, 100),
             'capacity_min' => $min,
             'capacity_max' => $max,
-            'zone' => fake()->randomElement(['Terrace', 'Main Hall', 'VIP', 'Garden']),
+            'zone' => fake()->randomElement(['Main Hall', 'Terrace', 'VIP', 'Bar']),
             'restaurant_id' => Restaurant::factory(),
         ];
     }

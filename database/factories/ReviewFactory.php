@@ -21,8 +21,8 @@ class ReviewFactory extends Factory
         return [
             'description' => fake()->paragraph(),
             'rating' => fake()->numberBetween(1, 5),
-            'restaurant_id' => Restaurant::factory(),
             'user_id' => User::factory(),
+            'restaurant_id' => Restaurant::factory(),
         ];
     }
 }

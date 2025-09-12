@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -21,34 +22,27 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'email' => fake()->unique()->safeEmail(),
-            'password' => static::$password ??= Hash::make('password'),
             'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->unique()->phoneNumber(),
             'email_verified_at' => now(),
-            'phone_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
             'is_blocked' => false,
         ];
     }
 
-    public function blocked(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'is_blocked' => true,
-        ]);
-    }
-
-    public function unverifiedEmail(): static
+    public function unverified(): static
     {
         return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
 
-    public function unverifiedPhone(): static
+    public function blocked(): static
     {
         return $this->state(fn(array $attributes) => [
-            'phone_verified_at' => null,
+            'is_blocked' => true,
         ]);
     }
 }

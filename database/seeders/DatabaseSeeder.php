@@ -6,156 +6,113 @@ use App\Models\Reminder_type;
 use App\Models\Reservation_statuse;
 use App\Models\Restaurant;
 use App\Models\Restaurant_chain;
+use App\Models\RestaurantChain;
+use App\Models\RestaurantSchedule;
+use App\Models\Review;
 use App\Models\Role;
+use App\Models\Table;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Создаем роли
-        $roles = Role::factory()->createMany([
-            ['name' => 'user'],
-            ['name' => 'admin'],
-            ['name' => 'superadmin'],
+        $this->call([
+            RoleSeeder::class,
+            ReservationStatusSeeder::class,
+            ReminderTypeSeeder::class,
         ]);
 
-        // 2. Создаем пользователей
-        $users = User::factory(30)->create();
-        $blockedUsers = User::factory(3)->blocked()->create();
-        $allUsers = $users->merge($blockedUsers);
-
-        // 3. Назначаем роли пользователям
+        // Получаем роли из базы данных
         $userRole = Role::where('name', 'user')->first();
-        foreach ($allUsers as $user) {
-            UserRole::create([
-                'user_id' => $user->id,
-                'role_id' => $userRole->id
-            ]);
+        $adminRole = Role::where('name', 'admin')->first();
+        $superAdminRole = Role::where('name', 'superadmin')->first();
+
+        //  Создаем 30 обычных пользователей
+        $regularUsers = User::factory(30)->create();
+        foreach ($regularUsers as $user) {
+            $user->roles()->attach($userRole);
         }
 
-        // 4. Создаем статусы бронирования
-        $statuses = ['pending', 'Confirmed', 'Modified', 'Cancelled', 'Completed', 'No-show'];
-        foreach ($statuses as $status) {
-            ReservationStatus::create(['name' => $status]);
+        //  Создаем 3 заблокированных пользователя
+        $blockedUsers = User::factory(3)->blocked()->create();
+        foreach ($blockedUsers as $user) {
+            $user->roles()->attach($userRole);
         }
 
-        // 5. Создаем типы напоминаний
-        $reminders = [
-            ['name' => '30min', 'minutes_before' => 30, 'is_default' => false],
-            ['name' => '1h', 'minutes_before' => 60, 'is_default' => true],
-            ['name' => '2h', 'minutes_before' => 120, 'is_default' => false],
-            ['name' => '3h', 'minutes_before' => 180, 'is_default' => false],
-            ['name' => '6h', 'minutes_before' => 360, 'is_default' => false],
-            ['name' => '12h', 'minutes_before' => 720, 'is_default' => false],
-            ['name' => '24h', 'minutes_before' => 1440, 'is_default' => false],
-            ['name' => '2d', 'minutes_before' => 2880, 'is_default' => false],
-        ];
+        $allRestaurants = collect();
 
-        foreach ($reminders as $reminder) {
-            ReminderType::create($reminder);
-        }
-
-        // 6. Создаем сети ресторанов
-        $chains = RestaurantChain::factory(2)->create();
-
-        // 7. Для каждой сети создаем 5 ресторанов
-        $restaurants = collect();
-        $chainAdmins = collect();
-
-        foreach ($chains as $chain) {
-            $chainRestaurants = Restaurant::factory(5)->create([
-                'restaurant_chain_id' => $chain->id
-            ]);
-
-            $restaurants = $restaurants->merge($chainRestaurants);
-
+        // Создаем 2 сети ресторанов
+        RestaurantChain::factory(2)->create()->each(function ($chain) use ($superAdminRole, $adminRole, &$allRestaurants) {
             // Создаем суперадмина для сети
-            $superAdmin = User::factory()->create();
-            UserRole::create([
-                'user_id' => $superAdmin->id,
-                'role_id' => Role::where('name', 'superadmin')->first()->id
+            $superAdmin = User::factory()->create([
+                'email' => 'superadmin@' . strtolower(str_replace(' ', '', $chain->name)) . '.com',
             ]);
+            $superAdmin->roles()->attach($superAdminRole);
+            $chain->superAdmins()->attach($superAdmin);
 
-            ChainSuperAdmin::create([
-                'user_id' => $superAdmin->id,
-                'restaurant_chain_id' => $chain->id
+            // Создаем 5 ресторанов в каждой сети
+            $chainRestaurants = Restaurant::factory(5)->create(['restaurant_chain_id' => $chain->id]);
+
+            $chainRestaurants->each(function ($restaurant) use ($adminRole) {
+                // Создаем админа для каждого ресторана
+                $admin = User::factory()->create([
+                    'email' => 'admin@' . strtolower(str_replace(' ', '', $restaurant->name)) . '.com',
+                ]);
+                $admin->roles()->attach($adminRole);
+                $restaurant->administrators()->attach($admin);
+            });
+            $allRestaurants = $allRestaurants->merge($chainRestaurants);
+        });
+
+        // Создаем 10 ресторанов без сети
+        $standaloneRestaurants = Restaurant::factory(10)->create();
+        $standaloneRestaurants->each(function ($restaurant) use ($adminRole) {
+            // Создаем админа для каждого ресторана
+            $admin = User::factory()->create([
+                'email' => 'admin@' . strtolower(str_replace([' ', ','], '', $restaurant->name)) . '.com',
             ]);
+            $admin->roles()->attach($adminRole);
+            $restaurant->administrators()->attach($admin);
+        });
+        $allRestaurants = $allRestaurants->merge($standaloneRestaurants);
 
-            // Создаем админов для ресторанов сети
-            foreach ($chainRestaurants as $restaurant) {
-                $admin = User::factory()->create();
-                UserRole::create([
-                    'user_id' => $admin->id,
-                    'role_id' => Role::where('name', 'admin')->first()->id
+        // Добавляем отзывы, расписание и столики для КАЖДОГО ресторана
+        $allRestaurants->each(function ($restaurant) use ($regularUsers) {
+            // Добавляем 2 отзыва от случайных обычных пользователей
+            $usersForReview = $regularUsers->random(2)->unique('id');
+            foreach ($usersForReview as $user) {
+                Review::factory()->create([
+                    'user_id' => $user->id,
+                    'restaurant_id' => $restaurant->id,
                 ]);
-
-                RestaurantAdmin::create([
-                    'user_id' => $admin->id,
-                    'restaurant_id' => $restaurant->id
-                ]);
-
-                $chainAdmins->push($admin);
             }
-        }
 
-        // 8. Создаем 10 независимых ресторанов
-        $independentRestaurants = Restaurant::factory(10)->create();
-        $independentAdmins = collect();
-
-        foreach ($independentRestaurants as $restaurant) {
-            $admin = User::factory()->create();
-            UserRole::create([
-                'user_id' => $admin->id,
-                'role_id' => Role::where('name', 'admin')->first()->id
-            ]);
-
-            RestaurantAdmin::create([
-                'user_id' => $admin->id,
-                'restaurant_id' => $restaurant->id
-            ]);
-
-            $independentAdmins->push($admin);
-        }
-
-        $allRestaurants = $restaurants->merge($independentRestaurants);
-
-        // 9. Создаем отзывы для ресторанов
-        foreach ($allRestaurants as $restaurant) {
-            Review::factory(2)->create([
-                'restaurant_id' => $restaurant->id,
-                'user_id' => $users->random()->id
-            ]);
-        }
-
-        // 10. Создаем расписания на особые даты
-        foreach ($allRestaurants as $restaurant) {
+            // Заполняем расписание на 31 декабря и 1 января
+            $year = Carbon::now()->year;
             RestaurantSchedule::create([
                 'restaurant_id' => $restaurant->id,
-                'date' => '2024-12-31',
-                'opens_at' => '10:00',
-                'closes_at' => '18:00',
-                'is_closed' => false,
-                'description' => 'New Year Eve Special Hours'
+                'date' => "{$year}-12-31",
+                'opens_at' => '10:00:00',
+                'closes_at' => '18:00:00',
             ]);
-
             RestaurantSchedule::create([
                 'restaurant_id' => $restaurant->id,
-                'date' => '2025-01-01',
-                'opens_at' => '10:00',
-                'closes_at' => '18:00',
-                'is_closed' => false,
-                'description' => 'New Year Day Special Hours'
+                'date' => ($year + 1) . "-01-01",
+                'opens_at' => '10:00:00',
+                'closes_at' => '18:00:00',
             ]);
-        }
 
-        // 11. Создаем столики для ресторанов
-        foreach ($allRestaurants as $restaurant) {
-            Table::factory(10)->create([
-                'restaurant_id' => $restaurant->id
-            ]);
-        }
+            for ($i = 1; $i <= 10; $i++) {
+                Table::factory()->create([
+                    'restaurant_id' => $restaurant->id,
+                    'number' => $i,
+                ]);
+            }
+        });
     }
 }

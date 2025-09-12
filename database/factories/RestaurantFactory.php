@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Restaurant_chain;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,25 +18,22 @@ class RestaurantFactory extends Factory
     {
         return [
             'name' => fake()->company(),
-            'description' => fake()->paragraph(),
+            'description' => fake()->paragraph(3),
             'address' => fake()->unique()->address(),
-            'type_kitchen' => fake()->randomElement(['Italian', 'Japanese', 'Mexican', 'Russian', 'Fusion']),
-            'price_range' => fake()->randomElement(['500-1000', '1000-2000', '5000-10000']),
-            'weekdays_opens_at' => fake()->time('H:i', '10:00'),
-            'weekdays_closes_at' => fake()->time('H:i', '23:00'),
-            'weekend_opens_at' => fake()->time('H:i', '11:00'),
-            'weekend_closes_at' => fake()->time('H:i', '01:00'),
-            'cancellation_policy' => fake()->sentence(),
+            'type_kitchen' => fake()->randomElement([
+                'Italian',
+                'French',
+                'Japanese',
+                'Mexican',
+                'Indian'
+            ]),
+            'price_range' => fake()->randomElement(['500-1000', '1000-2000', '2000-3000']),
+            'weekdays_opens_at' => '09:00:00',
+            'weekdays_closes_at' => '22:00:00',
+            'weekend_opens_at' => '10:00:00',
+            'weekend_closes_at' => '23:00:00',
+            'cancellation_policy' => fake()->sentence(10),
             'restaurant_chain_id' => null,
         ];
-    }
-
-    public function withChain(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'restaurant_chain_id' => Restaurant_chain::factory()
-            ];
-        });
     }
 }
