@@ -28,9 +28,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Получаем роли из базы данных
+        $guestRole = Role::where('name', 'guest')->first();
         $userRole = Role::where('name', 'user')->first();
         $adminRole = Role::where('name', 'admin')->first();
         $superAdminRole = Role::where('name', 'superadmin')->first();
+
+        // Создаем 3 гостя
+        $guestUsers = User::factory(3)->unverified()->create();
+        foreach ($guestUsers as $user) {
+            $user->roles()->attach($guestRole);
+        }
 
         //  Создаем 30 обычных пользователей
         $regularUsers = User::factory(30)->create();
