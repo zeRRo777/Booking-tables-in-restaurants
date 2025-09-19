@@ -8,6 +8,7 @@ use App\Models\Restaurant;
 use App\Models\Restaurant_chain;
 use App\Models\RestaurantChain;
 use App\Models\RestaurantSchedule;
+use App\Models\RestaurantStatuse;
 use App\Models\Review;
 use App\Models\Role;
 use App\Models\Table;
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             ReservationStatusSeeder::class,
             ReminderTypeSeeder::class,
+            RestaurantStatusSeeder::class
         ]);
 
         // Получаем роли из базы данных
@@ -61,8 +63,10 @@ class DatabaseSeeder extends Seeder
 
         $allRestaurants = collect();
 
+        $activeStatus = RestaurantStatuse::where('name', 'active')->first();
+
         // Создаем 2 сети ресторанов
-        RestaurantChain::factory(2)->create()->each(function ($chain) use ($adminChainRole, $adminRestaurantRole, &$allRestaurants) {
+        RestaurantChain::factory(2)->create()->each(function ($chain) use ($adminChainRole, $adminRestaurantRole, &$allRestaurants, $activeStatus) {
             // Создаем суперадмина для сети
             $superAdmin = User::factory()->create([
                 'email' => 'superadmin@' . strtolower(str_replace(' ', '', $chain->name)) . '.com',
@@ -71,7 +75,7 @@ class DatabaseSeeder extends Seeder
             $chain->superAdmins()->attach($superAdmin);
 
             // Создаем 5 ресторанов в каждой сети
-            $chainRestaurants = Restaurant::factory(5)->create(['restaurant_chain_id' => $chain->id]);
+            $chainRestaurants = Restaurant::factory(5)->create(['restaurant_chain_id' => $chain->id, 'status_id' => $activeStatus->id]);
 
             $chainRestaurants->each(function ($restaurant) use ($adminRestaurantRole) {
                 // Создаем админа для каждого ресторана
@@ -85,7 +89,7 @@ class DatabaseSeeder extends Seeder
         });
 
         // Создаем 10 ресторанов без сети
-        $standaloneRestaurants = Restaurant::factory(10)->create();
+        $standaloneRestaurants = Restaurant::factory(10)->create(['status_id' => $activeStatus->id]);
         $standaloneRestaurants->each(function ($restaurant) use ($adminRestaurantRole) {
             // Создаем админа для каждого ресторана
             $admin = User::factory()->create([

@@ -29,6 +29,11 @@ return new class extends Migration
                 ->constrained('restaurant_chains', 'id')
                 ->nullOnDelete();
 
+            $table->foreignId('status_id')
+                ->nullable()
+                ->constrained('restaurant_statuses', 'id')
+                ->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
 

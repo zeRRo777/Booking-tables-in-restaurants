@@ -25,6 +25,7 @@ class Restaurant extends Model
         'weekend_closes_at',
         'cancellation_policy',
         'restaurant_chain_id',
+        'status_id'
     ];
 
     protected $casts = [
@@ -72,5 +73,10 @@ class Restaurant extends Model
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(RestaurantStatuse::class);
     }
 }

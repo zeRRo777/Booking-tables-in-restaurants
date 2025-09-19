@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\RestaurantStatuse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -34,6 +35,7 @@ class RestaurantFactory extends Factory
             'weekend_closes_at' => '23:00:00',
             'cancellation_policy' => fake()->sentence(10),
             'restaurant_chain_id' => null,
+            'status_id' => RestaurantStatuse::query()->where('name', 'moderation')->firstOrCreate(['name' => 'moderation'])->id,
         ];
     }
 }
