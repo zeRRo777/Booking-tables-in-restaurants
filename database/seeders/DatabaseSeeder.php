@@ -30,8 +30,16 @@ class DatabaseSeeder extends Seeder
         // Получаем роли из базы данных
         $guestRole = Role::where('name', 'guest')->first();
         $userRole = Role::where('name', 'user')->first();
-        $adminRole = Role::where('name', 'admin')->first();
-        $superAdminRole = Role::where('name', 'superadmin')->first();
+        $adminRestaurantRole = Role::where('name', 'admin_restaurant')->first();
+        $adminChainRole = Role::where('name', 'admin_chain')->first();
+        $globalAdminRole = Role::where('name', 'superadmin')->first();
+
+
+        //Создаем 1 глобального админа
+        $globalAdmin = User::factory()->create([
+            'email' => 'admin@admin.com',
+        ]);
+        $globalAdmin->roles()->attach($globalAdminRole);
 
         // Создаем 3 гостя
         $guestUsers = User::factory(3)->unverified()->create();
@@ -54,23 +62,23 @@ class DatabaseSeeder extends Seeder
         $allRestaurants = collect();
 
         // Создаем 2 сети ресторанов
-        RestaurantChain::factory(2)->create()->each(function ($chain) use ($superAdminRole, $adminRole, &$allRestaurants) {
+        RestaurantChain::factory(2)->create()->each(function ($chain) use ($adminChainRole, $adminRestaurantRole, &$allRestaurants) {
             // Создаем суперадмина для сети
             $superAdmin = User::factory()->create([
                 'email' => 'superadmin@' . strtolower(str_replace(' ', '', $chain->name)) . '.com',
             ]);
-            $superAdmin->roles()->attach($superAdminRole);
+            $superAdmin->roles()->attach($adminChainRole);
             $chain->superAdmins()->attach($superAdmin);
 
             // Создаем 5 ресторанов в каждой сети
             $chainRestaurants = Restaurant::factory(5)->create(['restaurant_chain_id' => $chain->id]);
 
-            $chainRestaurants->each(function ($restaurant) use ($adminRole) {
+            $chainRestaurants->each(function ($restaurant) use ($adminRestaurantRole) {
                 // Создаем админа для каждого ресторана
                 $admin = User::factory()->create([
                     'email' => 'admin@' . strtolower(str_replace(' ', '', $restaurant->name)) . '.com',
                 ]);
-                $admin->roles()->attach($adminRole);
+                $admin->roles()->attach($adminRestaurantRole);
                 $restaurant->administrators()->attach($admin);
             });
             $allRestaurants = $allRestaurants->merge($chainRestaurants);
@@ -78,12 +86,12 @@ class DatabaseSeeder extends Seeder
 
         // Создаем 10 ресторанов без сети
         $standaloneRestaurants = Restaurant::factory(10)->create();
-        $standaloneRestaurants->each(function ($restaurant) use ($adminRole) {
+        $standaloneRestaurants->each(function ($restaurant) use ($adminRestaurantRole) {
             // Создаем админа для каждого ресторана
             $admin = User::factory()->create([
                 'email' => 'admin@' . strtolower(str_replace([' ', ','], '', $restaurant->name)) . '.com',
             ]);
-            $admin->roles()->attach($adminRole);
+            $admin->roles()->attach($adminRestaurantRole);
             $restaurant->administrators()->attach($admin);
         });
         $allRestaurants = $allRestaurants->merge($standaloneRestaurants);
