@@ -18,14 +18,18 @@ class TestController extends Controller
      * response=200,
      * description="Application is healthy",
      * @OA\JsonContent(
-     * @OA\Schema(ref="#/components/schemas/HealthStatus")
+     * @OA\Property(property="app", type="string", example="ok"),
+     * @OA\Property(property="database", type="string", example="ok"),
+     * @OA\Property(property="redis", type="string", example="ok"),
      * )
      * ),
      * @OA\Response(
      * response=503,
      * description="Service unavailable",
      * @OA\JsonContent(
-     * @OA\Schema(ref="#/components/schemas/HealthStatus")
+     * @OA\Property(property="app", type="string", example="failed"),
+     * @OA\Property(property="database", type="string", example="failed"),
+     * @OA\Property(property="redis", type="string", example="failed"),
      * )
      * )
      * )
@@ -50,28 +54,6 @@ class TestController extends Controller
         return response()->json($status, $statusCode);
     }
 
-    /**
-     * @OA\Schema(
-     * schema="HealthStatus",
-     * title="Health Status",
-     * description="The health status of the application and its services.",
-     * @OA\Property(
-     * property="app",
-     * type="string",
-     * example="ok"
-     * ),
-     * @OA\Property(
-     * property="database",
-     * type="string",
-     * example="ok"
-     * ),
-     * @OA\Property(
-     * property="redis",
-     * type="string",
-     * example="ok"
-     * )
-     * )
-     */
     protected function checkdatabaseConnection(): string
     {
         try {

@@ -21,13 +21,29 @@
                     "Health"
                 ],
                 "summary": "Check application health",
-                "operationId": "67dfd4816d9425cf14aab47457dd9ac9",
+                "operationId": "c09d93bf980e72e094876343292e7602",
                 "responses": {
                     "200": {
                         "description": "Application is healthy",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "app": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "database": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "redis": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     },
@@ -35,7 +51,23 @@
                         "description": "Service unavailable",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "properties": {
+                                        "app": {
+                                            "type": "string",
+                                            "example": "failed"
+                                        },
+                                        "database": {
+                                            "type": "string",
+                                            "example": "failed"
+                                        },
+                                        "redis": {
+                                            "type": "string",
+                                            "example": "failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         }
                     }
@@ -44,27 +76,6 @@
         }
     },
     "components": {
-        "schemas": {
-            "HealthStatus": {
-                "title": "Health Status",
-                "description": "The health status of the application and its services.",
-                "properties": {
-                    "app": {
-                        "type": "string",
-                        "example": "ok"
-                    },
-                    "database": {
-                        "type": "string",
-                        "example": "ok"
-                    },
-                    "redis": {
-                        "type": "string",
-                        "example": "ok"
-                    }
-                },
-                "type": "object"
-            }
-        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
