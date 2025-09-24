@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('email', 50)->unique();
             $table->string('password');
-            $table->string('name', 100)->nullable();
-            $table->string('phone', 20)->nullable()->unique();
+            $table->string('name', 100);
+            $table->string('phone', 20)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->boolean('is_blocked')->default(false);
