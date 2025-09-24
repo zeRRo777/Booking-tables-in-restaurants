@@ -22,7 +22,7 @@ class UserService
             $user = $this->userRepository->create($dto);
             $user->roles()->attach(Role::where('name', 'user')->first());
 
-            $token = $this->authService->login($user);
+            $token = $this->authService->createAndSaveToken($user);
             Log::info('Новый пользователь создан успешно', ['user_id' => $user->id]);
             return ['user' => $user, 'token' => $token->token];
         });

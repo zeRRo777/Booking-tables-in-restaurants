@@ -12,4 +12,6 @@ interface UserRepositoryInterface
     public function create(CreateUserDTO $dto): User;
 
     public function createToken(CreateUserTokenDTO $dto): UserToken;
+
+    public function findByEmail(string $email): ?User;
 }

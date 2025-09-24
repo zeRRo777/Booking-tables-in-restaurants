@@ -29,4 +29,9 @@ class EloquentUserRepository implements UserRepositoryInterface
             'expires_at' => $dto->expires_at,
         ]);
     }
+
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
+    }
 }

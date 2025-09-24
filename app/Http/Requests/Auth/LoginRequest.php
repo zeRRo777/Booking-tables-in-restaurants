@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Auth;
 
-use App\DTOs\CreateUserDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUserRequest extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,16 +22,9 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'unique:users,email', 'max:50'],
-            'password' => ['required', 'min:8', 'confirmed'],
-            'name' => ['required', 'max:100', 'string'],
-            'phone' => ['required', 'max:12', 'regex:/^\+\d{11}$/']
+            'email' => ['required', 'email', 'max:50'],
+            'password' => ['required', 'string'],
         ];
-    }
-
-    public function toDTO(): CreateUserDTO
-    {
-        return CreateUserDTO::from($this->validated());
     }
 
     public function attributes(): array
@@ -40,8 +32,6 @@ class StoreUserRequest extends FormRequest
         return [
             'email' => 'Почта',
             'password' => 'Пароль',
-            'name' => 'Имя',
-            'phone' => 'Телефон'
         ];
     }
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserToken;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
@@ -15,7 +16,7 @@ class AuthService
         protected UserRepositoryInterface $userRepository
     ) {}
 
-    public function login(User $user): UserToken
+    public function createAndSaveToken(User $user): UserToken
     {
         $token = JWTAuth::fromUser($user);
 
@@ -25,8 +26,17 @@ class AuthService
 
         $userTokenDTO = new CreateUserTokenDTO($user->id, $token, $expiresAt);
 
-        $token = $this->userRepository->createToken($userTokenDTO);
+        return $this->userRepository->createToken($userTokenDTO);
+    }
 
-        return $token;
+    public function authenticate(string $email, string $password): ?User
+    {
+        $user = $this->userRepository->findByEmail($email);
+
+        if ($user && Hash::check($password, $user->password)) {
+            return $user;
+        }
+
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\GuestMiddleware;
@@ -9,5 +10,7 @@ Route::get('/health', [TestController::class, 'health']);
 
 Route::middleware(GuestMiddleware::class)->group(function () {
 
-    Route::post('/register', [UserController::class, 'store']);
+    Route::post('/register', [AuthController::class, 'register']);
+
+    Route::post('/login', [AuthController::class, 'login']);
 });
