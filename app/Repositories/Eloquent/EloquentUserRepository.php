@@ -34,4 +34,9 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         return User::where('email', $email)->first();
     }
+
+    public function deleteToken(string $token): bool
+    {
+        return UserToken::where('token', $token)->delete();
+    }
 }

@@ -39,4 +39,15 @@ class AuthService
 
         return null;
     }
+
+    public function logout(): void
+    {
+        $token = JWTAuth::getToken();
+
+        if ($token) {
+            $this->userRepository->deleteToken($token);
+
+            JWTAuth::invalidate($token);
+        }
+    }
 }

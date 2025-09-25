@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -232,5 +233,61 @@ class AuthController extends Controller
             'user' => new UserResource($user),
             'token' => $token,
         ], 201);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/logout",
+     * tags={"Auth"},
+     * summary="Выход пользователя из системы",
+     * description="Удаляет JWT токен из бд",
+     * security={{"bearerAuth":{}}},
+     * @OA\Response(
+     * response=200,
+     * description="Пользователь успешно вышел из системы",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Вы успешно вышли из системы."),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/logout")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутренняя ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/logout-error"),
+     * @OA\Property(property="title", type="string", example="Logout Error"),
+     * @OA\Property(property="status", type="integer", example=500),
+     * @OA\Property(property="detail", type="string", example="Не удалось выйти из системы."),
+     * @OA\Property(property="instance", type="string", example="/api/logout")
+     * )
+     * ),
+     * )
+     */
+    public function logout(): JsonResponse
+    {
+        try {
+            $this->authService->logout();
+            return response()->json(['message' => 'Вы успешно вышли из системы.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Ошибка при выходе из системы: ' . $e->getMessage());
+
+            return response()->json([
+                'type' => 'https://example.com/errors/logout-error',
+                'title' => 'Logout Error',
+                'status' => 500,
+                'detail' => 'Не удалось выйти из системы.',
+                'instance' => request()->getUri(),
+            ], 500);
+        }
     }
 }

@@ -18,11 +18,6 @@ class ValidateTokenInDatabase
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        if (!Auth::check()) {
-            return $next($request);
-        }
-
         try {
             $token = JWTAuth::getToken();
             if (!$token) {

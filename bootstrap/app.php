@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Middleware\ValidateTokenInDatabase;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 
@@ -14,20 +16,29 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        ValidateTokenInDatabase::class;
-    })
+    ->withMiddleware(function (Middleware $middleware): void {})
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
                     'type'   => 'https://example.com/errors/validation-error',
                     'title'  => 'Validation Error',
-                    'status' => $e->status,
+                    'status' => 422,
                     'detail' => 'Произошла одна или несколько ошибок проверки.',
                     'instance' => $request->getUri(),
                     'errors' => $e->errors(),
-                ]);
+                ], 422);
+            }
+        });
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'type' => 'https://example.com/errors/unauthorized',
+                    'title' => 'You not authorized',
+                    'status' => 401,
+                    'detail' => 'Доступ к ресурсу доступен только авторизованным пользователям!',
+                    'instance' => $request->getUri(),
+                ], 401);
             }
         });
     })->create();
