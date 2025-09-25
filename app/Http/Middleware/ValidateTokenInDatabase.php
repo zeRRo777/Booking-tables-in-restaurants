@@ -6,6 +6,7 @@ use App\Models\UserToken;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -48,6 +49,9 @@ class ValidateTokenInDatabase
                 ], 401);
             }
         } catch (\Exception $e) {
+
+            Log::error('Token validation error: ' . $e->getMessage(), ['exception' => $e]);
+
             return response()->json([
                 'type' => 'https://example.com/errors/token',
                 'title'  => 'An error occurred while validating token',

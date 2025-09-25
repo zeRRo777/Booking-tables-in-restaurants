@@ -16,4 +16,8 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     public function deleteToken(string $token): bool;
+
+    public function findById(int $id): ?User;
+
+    public function update(User $user, array $data): bool;
 }

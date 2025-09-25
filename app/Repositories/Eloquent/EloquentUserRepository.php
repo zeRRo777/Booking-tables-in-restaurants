@@ -39,4 +39,14 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         return UserToken::where('token', $token)->delete();
     }
+
+    public function findById(int $id): ?User
+    {
+        return User::find($id);
+    }
+
+    public function update(User $user, array $data): bool
+    {
+        return $user->update($data);
+    }
 }

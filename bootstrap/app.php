@@ -8,6 +8,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -39,6 +41,17 @@ return Application::configure(basePath: dirname(__DIR__))
                     'detail' => 'Доступ к ресурсу доступен только авторизованным пользователям!',
                     'instance' => $request->getUri(),
                 ], 401);
+            }
+        });
+        $exceptions->render(function (AccessDeniedException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'type'     => 'https://example.com/errors/forbidden',
+                    'title'    => 'You not authorized',
+                    'status'   => 403,
+                    'detail'   => 'Доступ к ресурсу запрещен!',
+                    'instance' => $request->getUri(),
+                ], 403);
             }
         });
     })->create();

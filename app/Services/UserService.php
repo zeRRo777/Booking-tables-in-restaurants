@@ -6,6 +6,7 @@ use App\DTOs\CreateUserDTO;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,5 +29,16 @@ class UserService
         });
 
         return $dataUser;
+    }
+
+    public function updateUser(User $user, array $data): User|bool
+    {
+        $result = $this->userRepository->update($user, $data);
+
+        if (!$result) {
+            throw new \Exception('Ошибка при обновлении пользователя!');
+        }
+
+        return $this->userRepository->findById($user->id);
     }
 }
