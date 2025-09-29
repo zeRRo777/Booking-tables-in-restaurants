@@ -139,7 +139,7 @@ class UserController extends Controller
             $updatedUser = $this->userService->updateUser($user, $request->validated());
 
             return response()->json([
-                'user' => new UserResource($user),
+                'user' => new UserResource($updatedUser),
                 'result' => true
             ]);
         } catch (\Exception $e) {
