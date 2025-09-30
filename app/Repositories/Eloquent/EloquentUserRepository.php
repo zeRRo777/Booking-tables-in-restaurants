@@ -49,4 +49,9 @@ class EloquentUserRepository implements UserRepositoryInterface
     {
         return $user->update($data);
     }
+
+    public function delete(User $user, bool $real = false): bool
+    {
+        return $real ? $user->forceDelete() : $user->delete();
+    }
 }

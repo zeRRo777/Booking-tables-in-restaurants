@@ -41,4 +41,13 @@ class UserService
 
         return $this->userRepository->findById($user->id);
     }
+
+    public function deleteUser(User $user, bool $real = false): bool
+    {
+        $result = DB::transaction(function () use ($user, $real): bool {
+            return $this->userRepository->delete($user, $real);
+        });
+
+        return $result;
+    }
 }

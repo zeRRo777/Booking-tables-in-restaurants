@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -18,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {})
+    ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prependToGroup('api', ForceJsonResponse::class);
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {

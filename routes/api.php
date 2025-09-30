@@ -19,7 +19,9 @@ Route::middleware(GuestMiddleware::class)->group(function () {
 Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/me', [UserController::class, 'profile']);
-
-    Route::patch('/me', [UserController::class, 'updateMe']);
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/me', 'profile');
+        Route::patch('/me', 'updateMe');
+        Route::delete('/me', 'deleteMe');
+    });
 });

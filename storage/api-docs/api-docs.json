@@ -772,6 +772,72 @@
                     }
                 ]
             },
+            "delete": {
+                "tags": [
+                    "ME"
+                ],
+                "summary": "Удаление текущего пользователя",
+                "description": "Удаление текущего пользователя",
+                "operationId": "6a521e83ea911a61b0783b65c5554a0e",
+                "responses": {
+                    "204": {
+                        "description": "Пользователь успешно удален"
+                    },
+                    "401": {
+                        "description": "Вы не авторизованы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/unauthorized"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/me"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка при удалении данных"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "ME"

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 /**
@@ -20,7 +22,8 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 class UserController extends Controller
 {
     public function __construct(
-        protected UserService $userService
+        protected UserService $userService,
+        protected AuthService $authService,
     ) {}
 
 
@@ -146,6 +149,58 @@ class UserController extends Controller
             return response()->json([
                 'result' => false,
                 'message' => 'Произошла ошибка при обновлении данных!'
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/me",
+     * tags={"ME"},
+     * summary="Удаление текущего пользователя",
+     * description="Удаление текущего пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно удален",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/me")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутренняя ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Произошла ошибка при удалении данных"),
+     * )
+     * )
+     * )
+     */
+    public function deleteMe(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!Gate::allows('deleteMe', $user)) {
+            throw new AccessDeniedException('Access denied');
+        }
+
+        try {
+            $this->userService->deleteUser($user, true);
+            $this->authService->logout();
+
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete user: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Произошла ошибка при удалении данных!'
             ], 500);
         }
     }
