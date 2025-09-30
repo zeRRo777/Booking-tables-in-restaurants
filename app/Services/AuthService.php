@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Models\UserToken;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
@@ -49,5 +52,25 @@ class AuthService
 
             JWTAuth::invalidate($token);
         }
+    }
+
+    public function changePassword(User $user, string $password): void
+    {
+
+        $tokens = $user->tokens()->pluck('token');
+
+        DB::transaction(function () use ($user, $password, $tokens): void {
+            $this->userRepository->update($user, ['password' => Hash::make($password)]);
+
+            $user->tokens()->delete();
+
+            foreach ($tokens as $token) {
+                try {
+                    JWTAuth::invalidate($token);
+                } catch (Exception $e) {
+                    Log::warning('JWT Token invalidation failed after password change: ' . $e->getMessage());
+                }
+            }
+        });
     }
 }

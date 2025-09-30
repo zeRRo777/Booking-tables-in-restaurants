@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\ChangePasswordUser;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Services\UserService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -220,7 +222,7 @@ class AuthController extends Controller
      * ),
      * )
      */
-    public function register(StoreUserRequest $request): JsonResponse
+    public function register(RegisterUserRequest $request): JsonResponse
     {
         $userDTO = $request->toDTO();
 
@@ -288,6 +290,74 @@ class AuthController extends Controller
                 'detail' => 'Не удалось выйти из системы.',
                 'instance' => request()->getUri(),
             ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/password/change",
+     * tags={"Auth"},
+     * summary="Смена пароля текущего пользователя",
+     * description="Смена пароля текущего пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для обновления",
+     * @OA\JsonContent(
+     * @OA\Property(property="old_password", type="string", example="password"),
+     * @OA\Property(property="password", type="string", example="new_password"),
+     * @OA\Property(property="password_confirmation", type="string", example="new_password"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно обновил пароль",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/login"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/logout")
+     * )
+     * ),
+     * )
+     */
+    public function changePassword(ChangePasswordUser $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $dataValidated = $request->validated();
+
+        try {
+            $this->authService->changePassword($user, $dataValidated['password']);
+
+            return response()->json(null, 204);
+        } catch (Exception $e) {
+            Log::error('Ошибка при смене пароля: ' . $e->getMessage());
+
+            return response()->json([
+                'type' => 'https://example.com/errors/change-password-error',
+                'title' => 'Change Password Error',
+                'status' => 500,
+                'detail' => 'Не удалось сменить пароль.',
+            ]);
         }
     }
 }

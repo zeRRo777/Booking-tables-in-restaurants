@@ -24,4 +24,6 @@ Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function 
         Route::patch('/me', 'updateMe');
         Route::delete('/me', 'deleteMe');
     });
+
+    Route::post('/auth/password/change', [AuthController::class, 'changePassword']);
 });

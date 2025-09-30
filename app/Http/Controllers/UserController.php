@@ -4,14 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Resources\UserResource;
-use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 
 /**
  * @OA\Tag(
@@ -134,10 +131,6 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        if (!Gate::allows('updateMe', $user)) {
-            throw new AccessDeniedException('Access denied');
-        }
-
         try {
             $updatedUser = $this->userService->updateUser($user, $request->validated());
 
@@ -187,10 +180,6 @@ class UserController extends Controller
     public function deleteMe(Request $request): JsonResponse
     {
         $user = $request->user();
-
-        if (!Gate::allows('deleteMe', $user)) {
-            throw new AccessDeniedException('Access denied');
-        }
 
         try {
             $this->userService->deleteUser($user, true);
