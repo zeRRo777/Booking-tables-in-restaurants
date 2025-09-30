@@ -26,7 +26,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     * path="/login",
+     * path="/auth/login",
      * tags={"Auth"},
      * summary="Авторизация пользователя",
      * description="авторизует и возвращает его данные вместе с JWT-токеном.",
@@ -141,7 +141,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     * path="/register",
+     * path="/auth/register",
      * tags={"Auth"},
      * summary="Регистрация нового пользователя",
      * description="Создает нового пользователя и возвращает его данные вместе с JWT-токеном.",
@@ -237,7 +237,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     * path="/logout",
+     * path="/auth/logout",
      * tags={"Auth"},
      * summary="Выход пользователя из системы",
      * description="Удаляет JWT токен из бд",

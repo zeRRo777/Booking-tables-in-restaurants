@@ -11,13 +11,13 @@ Route::get('/health', [TestController::class, 'health']);
 
 Route::middleware(GuestMiddleware::class)->group(function () {
 
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/auth/register', [AuthController::class, 'register']);
 
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
 });
 
 Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     Route::controller(UserController::class)->group(function () {
         Route::get('/me', 'profile');
