@@ -5,18 +5,23 @@ namespace App\Services;
 use App\DTOs\CreateUserTokenDTO;
 use App\Models\User;
 use App\Models\UserToken;
+use App\Notifications\PasswordResetNofication;
+use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
 {
     public function __construct(
-        protected UserRepositoryInterface $userRepository
+        protected UserRepositoryInterface $userRepository,
+        protected PasswordResetRepositoryInterface $passwordResetRepository,
     ) {}
 
     public function createAndSaveToken(User $user): UserToken
@@ -56,7 +61,6 @@ class AuthService
 
     public function changePassword(User $user, string $password): void
     {
-
         $tokens = $user->tokens()->pluck('token');
 
         DB::transaction(function () use ($user, $password, $tokens): void {
@@ -72,5 +76,18 @@ class AuthService
                 }
             }
         });
+    }
+
+    public function sendResetLink(string $email): void
+    {
+        $user = $this->userRepository->findByEmail($email);
+
+        if ($user) {
+            $token = Str::random(64);
+
+            $this->passwordResetRepository->createOrUpdate($email, Hash::make($token));
+
+            $user->notify(new PasswordResetNofication($token));
+        }
     }
 }

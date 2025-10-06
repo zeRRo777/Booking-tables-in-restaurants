@@ -738,6 +738,83 @@
                 ]
             }
         },
+        "/auth/password/reset": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Подготовка сброса пароля текущего пользователя",
+                "description": "Подготовка сброса пароля текущего пользователя",
+                "operationId": "bd629d8a811f498c42b26d86ffa129a8",
+                "requestBody": {
+                    "description": "Данные для сброса пароля",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "test@gmail.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Пользователь успешно обновил пароль",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/password-reset"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Password reset error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Не удалось отправить сообщение на почту."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/auth/password/reset"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "tags": [

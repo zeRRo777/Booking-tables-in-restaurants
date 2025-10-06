@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\ChangePasswordUser;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\PasswordResetRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
@@ -280,7 +281,7 @@ class AuthController extends Controller
         try {
             $this->authService->logout();
             return response()->json(['message' => 'Вы успешно вышли из системы.'], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Ошибка при выходе из системы: ' . $e->getMessage());
 
             return response()->json([
@@ -358,6 +359,59 @@ class AuthController extends Controller
                 'status' => 500,
                 'detail' => 'Не удалось сменить пароль.',
             ]);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/password/reset",
+     * tags={"Auth"},
+     * summary="Подготовка сброса пароля текущего пользователя",
+     * description="Подготовка сброса пароля текущего пользователя",
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для сброса пароля",
+     * @OA\JsonContent(
+     * @OA\Property(property="email", type="string", example="test@gmail.com"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Пользователь успешно обновил пароль",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля.")
+     * ),
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/password-reset"),
+     * @OA\Property(property="title", type="string", example="Password reset error"),
+     * @OA\Property(property="status", type="integer", example=500),
+     * @OA\Property(property="detail", type="string", example="Не удалось отправить сообщение на почту."),
+     * @OA\Property(property="instance", type="string", example="/auth/password/reset")
+     * )
+     * ),
+     * )
+     */
+    public function preperationResetPassword(PasswordResetRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->sendResetLink($request->validated('email'));
+
+            return response()->json([
+                'message' => 'Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля.',
+            ]);
+        } catch (Exception $e) {
+            Log::error('Ошибка при отправке ссылки для сброса пароля: ' . $e->getMessage());
+            return response()->json([
+                'type' => 'https://example.com/errors/password-reset',
+                'title' => 'Password reset error',
+                'status' => 500,
+                'detail' => 'Не удалось отправить сообщение на почту.',
+                'instance' => request()->getUri(),
+            ], 500);
         }
     }
 }

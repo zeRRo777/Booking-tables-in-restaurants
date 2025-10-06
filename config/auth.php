@@ -115,5 +115,6 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+    'password_reset_expiration' => env('AUTH_PASSWORD_RESET_EXPIRATION', 60),
 
 ];
