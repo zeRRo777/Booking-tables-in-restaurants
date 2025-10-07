@@ -16,6 +16,8 @@ Route::middleware(GuestMiddleware::class)->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
 
     Route::post('/auth/password/reset', [AuthController::class, 'preperationResetPassword']);
+
+    Route::post('/auth/password/reset/confirm', [AuthController::class, 'resetPassword']);
 });
 
 Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function () {

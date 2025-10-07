@@ -743,8 +743,8 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Подготовка сброса пароля текущего пользователя",
-                "description": "Подготовка сброса пароля текущего пользователя",
+                "summary": "Подготовка сброса пароля пользователя",
+                "description": "Подготовка сброса пароля  пользователя",
                 "operationId": "bd629d8a811f498c42b26d86ffa129a8",
                 "requestBody": {
                     "description": "Данные для сброса пароля",
@@ -805,6 +805,82 @@
                                         "instance": {
                                             "type": "string",
                                             "example": "/auth/password/reset"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/password/reset/confirm": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Подтверждение сброса пароля пользователя",
+                "description": "Подтверждение сброса пароля пользователя",
+                "operationId": "dd8141261de5835994ee4eec73255f2a",
+                "requestBody": {
+                    "description": "Данные для сброса пароля",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "test@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "new_password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "new_password"
+                                    },
+                                    "token": {
+                                        "type": "string",
+                                        "example": "fdfdfdfd545gfgfg3435454fdgfg"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Пользователь успешно обновил пароль"
+                    },
+                    "422": {
+                        "description": "Данные не верны",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://bookingService/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Неверные данные для сброса пароля."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/auth/password/reset/confirm"
                                         }
                                     },
                                     "type": "object"

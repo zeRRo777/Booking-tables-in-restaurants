@@ -90,4 +90,37 @@ class AuthService
             $user->notify(new PasswordResetNofication($token));
         }
     }
+
+    public function resetPassword(string $email, string $token, string $password): bool
+    {
+        $resetRecord = $this->passwordResetRepository->findByEmail($email);
+
+        if (!$resetRecord) {
+            return false;
+        }
+
+        if (!Hash::check($token, $resetRecord->token)) {
+            return false;
+        }
+
+        $expiresInMinutes = config('auth.passwords.users.expire', 60);
+
+        if (Carbon::parse($resetRecord->created_at)->addMinutes($expiresInMinutes)->isPast()) {
+            $this->passwordResetRepository->deleteByEmail($email);
+            return false;
+        }
+
+        $user = $this->userRepository->findByEmail($email);
+
+        if (!$user) {
+            return false;
+        }
+
+        DB::transaction(function () use ($user, $password, $email) {
+            $this->changePassword($user, $password);
+            $this->passwordResetRepository->deleteByEmail($email);
+        });
+
+        return true;
+    }
 }

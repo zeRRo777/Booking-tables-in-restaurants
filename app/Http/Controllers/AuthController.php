@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\ChangePasswordUser;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\PasswordResetConfirmRequest;
 use App\Http\Requests\Auth\PasswordResetRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
@@ -366,8 +367,8 @@ class AuthController extends Controller
      * @OA\Post(
      * path="/auth/password/reset",
      * tags={"Auth"},
-     * summary="Подготовка сброса пароля текущего пользователя",
-     * description="Подготовка сброса пароля текущего пользователя",
+     * summary="Подготовка сброса пароля пользователя",
+     * description="Подготовка сброса пароля  пользователя",
      * @OA\RequestBody(
      * required=true,
      * description="Данные для сброса пароля",
@@ -413,5 +414,61 @@ class AuthController extends Controller
                 'instance' => request()->getUri(),
             ], 500);
         }
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/password/reset/confirm",
+     * tags={"Auth"},
+     * summary="Подтверждение сброса пароля пользователя",
+     * description="Подтверждение сброса пароля пользователя",
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для сброса пароля",
+     * @OA\JsonContent(
+     * @OA\Property(property="email", type="string", example="test@gmail.com"),
+     * @OA\Property(property="password", type="string", example="new_password"),
+     * @OA\Property(property="password_confirmation", type="string", example="new_password"),
+     * @OA\Property(property="token", type="string", example="fdfdfdfd545gfgfg3435454fdgfg"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно обновил пароль",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Данные не верны",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://bookingService/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Неверные данные для сброса пароля."),
+     * @OA\Property(property="instance", type="string", example="/auth/password/reset/confirm")
+     * )
+     * ),
+     * )
+     */
+    public function resetPassword(PasswordResetConfirmRequest $request): JsonResponse
+    {
+        $dataValidated = $request->validated();
+
+        $result = $this->authService->resetPassword(
+            $dataValidated['email'],
+            $dataValidated['token'],
+            $dataValidated['password']
+        );
+
+        if (!$result) {
+            return response()->json([
+                'type' => 'https://example.com/errors/validation-error',
+                'title' => 'Validation Error',
+                'status' => 422,
+                'detail' => 'Неверные данные для сброса пароля.',
+                'instance' => request()->getUri(),
+            ]);
+        }
+
+        return response()->json(null, 204);
     }
 }
