@@ -124,4 +124,5 @@ return [
     ],
 
     'frontend_url' => env('APP_FRONTEND_URL', 'http://localhost:3000'),
+    'support_email' => env('SUPPORT_EMAIL', 'support@booking-tables.com'),
 ];

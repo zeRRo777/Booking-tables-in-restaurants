@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Rules\OldPasswordCheck;
+use App\Rules\PasswordCheck;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ChangePasswordUser extends FormRequest
+class ChangePasswordUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class ChangePasswordUser extends FormRequest
     public function rules(): array
     {
         return [
-            'old_password' => ['required', new OldPasswordCheck()],
+            'old_password' => ['required', 'string', new PasswordCheck()],
             'password' => ['required', 'min:8', 'confirmed'],
         ];
     }

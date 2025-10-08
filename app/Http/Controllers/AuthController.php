@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Auth\ChangePasswordUser;
+use App\Http\Requests\Auth\ChangeEmailUserRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\PasswordResetConfirmRequest;
 use App\Http\Requests\Auth\PasswordResetRequest;
@@ -341,7 +341,7 @@ class AuthController extends Controller
      * ),
      * )
      */
-    public function changePassword(ChangePasswordUser $request): JsonResponse
+    public function changePassword(ChangeEmailUserRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -470,5 +470,86 @@ class AuthController extends Controller
         }
 
         return response()->json(null, 204);
+    }
+
+
+    /**
+     * @OA\Post(
+     * path="/auth/email/change",
+     * tags={"Auth"},
+     * summary="Подгтовка к смене почты пользователя",
+     * description="Подгтовка к смене почты пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для смены почты",
+     * @OA\JsonContent(
+     * @OA\Property(property="new_email", type="string", example="test@gmail.com"),
+     * @OA\Property(property="password", type="string", example="password"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Сообщение о смене почты успешно отрпвлено на почту",
+     * @OA\JsonContent(
+     * @OA\Property(property="message", type="string", example="Если ваша электронная почта существует, вы получите ссылку для смены почты."),
+     * ),
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Данные не верны",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://bookingService/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Неверные данные"),
+     * @OA\Property(property="instance", type="string", example="/auth/email/change")
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/auth/email/change")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/email-change"),
+     * @OA\Property(property="title", type="string", example="Email change error"),
+     * @OA\Property(property="status", type="integer", example=500),
+     * @OA\Property(property="detail", type="string", example="Ошибка при смене электорнной почты"),
+     * @OA\Property(property="instance", type="string", example="/auth/email/change")
+     * )
+     * ),
+     * )
+     */
+    public function prepareChangeEmail(ChangeEmailUserRequest $request): JsonResponse
+    {
+        $user = $request->user();
+
+        try {
+            $this->authService->sendChangeEmailLink($user, $request->validated(['new_email']));
+
+            return response()->json([
+                'message' => 'Если ваша электронная почта существует, вы получите ссылку для смены почты.',
+            ]);
+        } catch (Exception $e) {
+            Log::error('Ошибка при подготовке смены почты: ' . $e->getMessage());
+
+            return response()->json([
+                'type' => 'https://example.com/errors/email-change',
+                'title' => 'Email change error',
+                'status' => 500,
+                'detail' => 'Ошибка при смене электорнной почты',
+                'instance' => request()->getUri(),
+            ], 500);
+        }
     }
 }

@@ -5,7 +5,10 @@ namespace App\Services;
 use App\DTOs\CreateUserTokenDTO;
 use App\Models\User;
 use App\Models\UserToken;
+use App\Notifications\EmailChangeNewEmailNotification;
+use App\Notifications\EmailChangeOldEmailNotification;
 use App\Notifications\PasswordResetNofication;
+use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Carbon\Carbon;
@@ -22,6 +25,7 @@ class AuthService
     public function __construct(
         protected UserRepositoryInterface $userRepository,
         protected PasswordResetRepositoryInterface $passwordResetRepository,
+        protected EmailChangeRepositoryInterface $emailChangeRepository
     ) {}
 
     public function createAndSaveToken(User $user): UserToken
@@ -122,5 +126,13 @@ class AuthService
         });
 
         return true;
+    }
+
+    public function sendChangeEmailLink(User $user, string $newEmail): void
+    {
+        $token = Str::random(64);
+        $this->emailChangeRepository->createOrUpdate($user, Hash::make($token), $newEmail);
+        // $user->notify(new EmailChangeOldEmailNotification());
+        $user->notify(new EmailChangeNewEmailNotification($token));
     }
 }

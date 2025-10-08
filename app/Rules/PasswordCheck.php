@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class OldPasswordCheck implements ValidationRule
+class PasswordCheck implements ValidationRule
 {
     /**
      * Run the validation rule.
