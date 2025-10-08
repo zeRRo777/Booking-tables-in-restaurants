@@ -33,4 +33,6 @@ Route::middleware('throttle:api')->group(function () {
         Route::post('/auth/email/change', [AuthController::class, 'prepareChangeEmail']);
         Route::post('/auth/password/change', [AuthController::class, 'changePassword']);
     });
+
+    Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);
 });

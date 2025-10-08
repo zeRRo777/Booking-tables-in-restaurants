@@ -65,20 +65,9 @@ class AuthService
 
     public function changePassword(User $user, string $password): void
     {
-        $tokens = $user->tokens()->pluck('token');
-
-        DB::transaction(function () use ($user, $password, $tokens): void {
+        DB::transaction(function () use ($user, $password): void {
             $this->userRepository->update($user, ['password' => Hash::make($password)]);
-
-            $user->tokens()->delete();
-
-            foreach ($tokens as $token) {
-                try {
-                    JWTAuth::invalidate($token);
-                } catch (Exception $e) {
-                    Log::warning('JWT Token invalidation failed after password change: ' . $e->getMessage());
-                }
-            }
+            $this->invalidateAllUserTokens($user);
         });
     }
 
@@ -131,8 +120,56 @@ class AuthService
     public function sendChangeEmailLink(User $user, string $newEmail): void
     {
         $token = Str::random(64);
-        $this->emailChangeRepository->createOrUpdate($user, Hash::make($token), $newEmail);
+        $this->emailChangeRepository->createOrUpdate($user, $token, $newEmail);
         // $user->notify(new EmailChangeOldEmailNotification());
         $user->notify(new EmailChangeNewEmailNotification($token));
+    }
+
+    public function changeEmail(string $token): bool
+    {
+        $tokenObject = $this->emailChangeRepository->findByToken($token);
+
+        if (!$tokenObject) {
+            return false;
+        }
+
+        $user = $this->userRepository->findById($tokenObject->user_id);
+
+        if (!$user) {
+            return false;
+        }
+
+        $expiresInMinutes = config('auth.email_change_expiration', 60);
+
+        if (Carbon::parse($tokenObject->created_at)->addMinutes($expiresInMinutes)->isPast()) {
+            $this->emailChangeRepository->deleteByUser($user);
+            return false;
+        }
+
+        DB::transaction(function () use ($user, $tokenObject): void {
+            $this->userRepository->update($user, [
+                'email' => $tokenObject->new_email,
+                'email_verified_at' => Carbon::now(),
+            ]);
+            $this->emailChangeRepository->deleteByUser($user);
+            $this->invalidateAllUserTokens($user);
+        });
+
+        return true;
+    }
+
+    public function invalidateAllUserTokens(User $user): void
+    {
+        $tokens = $user->tokens()->pluck('token')->toArray();
+
+        $user->tokens()->delete();
+
+        foreach ($tokens as $token) {
+            try {
+                JWTAuth::invalidate($token);
+            } catch (Exception $e) {
+                Log::warning('JWT Token invalidation failed for user ' . $user->id . ': ' . $e->getMessage());
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\ChangeEmailUserConfirmRequest;
 use App\Http\Requests\Auth\ChangeEmailUserRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\PasswordResetConfirmRequest;
@@ -547,9 +548,56 @@ class AuthController extends Controller
                 'type' => 'https://example.com/errors/email-change',
                 'title' => 'Email change error',
                 'status' => 500,
-                'detail' => 'Ошибка при смене электорнной почты',
+                'detail' => 'Ошибка при подготовке смены почты',
                 'instance' => request()->getUri(),
             ], 500);
         }
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/email/change/confirm",
+     * tags={"Auth"},
+     * summary="Подтверждение смены почты пользователя",
+     * description="Подтверждение смены почты пользователя",
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для смены почты",
+     * @OA\JsonContent(
+     * @OA\Property(property="token", type="string", example="iSkJPWlhmMSIsInN1"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно сменил почту",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Данные не верны",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://bookingService/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Неверные данные для смены почты."),
+     * @OA\Property(property="instance", type="string", example="/auth/email/change/confirm")
+     * )
+     * ),
+     * )
+     */
+    public function changeEmail(ChangeEmailUserConfirmRequest $request): JsonResponse
+    {
+        $result = $this->authService->changeEmail($request->validated(['token']));
+
+        if (!$result) {
+            return response()->json([
+                'type' => 'https://example.com/errors/validation-error',
+                'title' => 'Validation Error',
+                'status' => 422,
+                'detail' => 'Неверные данные для смены почты.',
+                'instance' => request()->getUri(),
+            ]);
+        }
+
+        return response()->json(null, 204);
     }
 }

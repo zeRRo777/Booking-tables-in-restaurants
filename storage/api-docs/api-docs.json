@@ -1041,6 +1041,70 @@
                 ]
             }
         },
+        "/auth/email/change/confirm": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Подтверждение смены почты пользователя",
+                "description": "Подтверждение смены почты пользователя",
+                "operationId": "1c1c401d4319cbc037ada18fec089bff",
+                "requestBody": {
+                    "description": "Данные для смены почты",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "iSkJPWlhmMSIsInN1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Пользователь успешно сменил почту"
+                    },
+                    "422": {
+                        "description": "Данные не верны",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://bookingService/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Неверные данные для смены почты."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/auth/email/change/confirm"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "tags": [
