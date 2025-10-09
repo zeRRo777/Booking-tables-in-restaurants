@@ -349,7 +349,7 @@ class AuthController extends Controller
         $dataValidated = $request->validated();
 
         try {
-            $this->authService->changePassword($user, $dataValidated['password']);
+            $this->authService->changePassword($user, $dataValidated['password'], true);
 
             return response()->json(null, 204);
         } catch (Exception $e) {

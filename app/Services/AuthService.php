@@ -8,6 +8,7 @@ use App\Models\UserToken;
 use App\Notifications\EmailChangeNewEmailNotification;
 use App\Notifications\EmailChangeOldEmailNotification;
 use App\Notifications\PasswordResetNofication;
+use App\Notifications\SuccessChangePasswordNotification;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -63,12 +64,16 @@ class AuthService
         }
     }
 
-    public function changePassword(User $user, string $password): void
+    public function changePassword(User $user, string $password, bool $shouldNotify = false): void
     {
         DB::transaction(function () use ($user, $password): void {
             $this->userRepository->update($user, ['password' => Hash::make($password)]);
             $this->invalidateAllUserTokens($user);
         });
+
+        if ($shouldNotify) {
+            $user->notify(new SuccessChangePasswordNotification());
+        }
     }
 
     public function sendResetLink(string $email): void
@@ -110,9 +115,11 @@ class AuthService
         }
 
         DB::transaction(function () use ($user, $password, $email) {
-            $this->changePassword($user, $password);
+            $this->changePassword($user, $password, false);
             $this->passwordResetRepository->deleteByEmail($email);
         });
+
+        $user->notify(new SuccessChangePasswordNotification());
 
         return true;
     }
