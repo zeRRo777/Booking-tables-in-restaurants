@@ -8,6 +8,7 @@ use App\Models\UserToken;
 use App\Notifications\EmailChangeNewEmailNotification;
 use App\Notifications\EmailChangeOldEmailNotification;
 use App\Notifications\PasswordResetNofication;
+use App\Notifications\SuccessChangeEmailNotification;
 use App\Notifications\SuccessChangePasswordNotification;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
@@ -161,6 +162,8 @@ class AuthService
             $this->emailChangeRepository->deleteByUser($user);
             $this->invalidateAllUserTokens($user);
         });
+
+        $user->notify(new SuccessChangeEmailNotification());
 
         return true;
     }
