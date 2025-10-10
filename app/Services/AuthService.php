@@ -3,6 +3,12 @@
 namespace App\Services;
 
 use App\DTOs\CreateUserTokenDTO;
+use App\Exceptions\AuthenticateException;
+use App\Exceptions\MissingEmailChangeException;
+use App\Exceptions\MissingPasswordResetTokenException;
+use App\Exceptions\OperationDbException;
+use App\Exceptions\TokenExpiredException;
+use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserToken;
 use App\Notifications\EmailChangeNewEmailNotification;
@@ -13,6 +19,7 @@ use App\Notifications\SuccessChangePasswordNotification;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\UserTokensRepositoryInterface;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -27,7 +34,8 @@ class AuthService
     public function __construct(
         protected UserRepositoryInterface $userRepository,
         protected PasswordResetRepositoryInterface $passwordResetRepository,
-        protected EmailChangeRepositoryInterface $emailChangeRepository
+        protected EmailChangeRepositoryInterface $emailChangeRepository,
+        protected UserTokensRepositoryInterface $userTokensRepository,
     ) {}
 
     public function createAndSaveToken(User $user): UserToken
@@ -43,7 +51,7 @@ class AuthService
         return $this->userRepository->createToken($userTokenDTO);
     }
 
-    public function authenticate(string $email, string $password): ?User
+    public function authenticate(string $email, string $password): User
     {
         $user = $this->userRepository->findByEmail($email);
 
@@ -51,18 +59,20 @@ class AuthService
             return $user;
         }
 
-        return null;
+        throw new AuthenticateException('Неверный логин или пароль!');
     }
 
     public function logout(): void
     {
         $token = JWTAuth::getToken();
 
-        if ($token) {
-            $this->userRepository->deleteToken($token);
-
-            JWTAuth::invalidate($token);
+        if (!$token) {
+            throw new AuthenticateException('Токен для выхода из аккаунта не найден!', 401);
         }
+
+        $this->userRepository->deleteToken($token);
+
+        JWTAuth::invalidate($token);
     }
 
     public function changePassword(User $user, string $password, bool $shouldNotify = false): void
@@ -90,29 +100,29 @@ class AuthService
         }
     }
 
-    public function resetPassword(string $email, string $token, string $password): bool
+    public function resetPassword(string $email, string $token, string $password): void
     {
         $resetRecord = $this->passwordResetRepository->findByEmail($email);
 
         if (!$resetRecord) {
-            return false;
+            throw new MissingPasswordResetTokenException('Токен для сброса пароля не найден!');
         }
 
         if (!Hash::check($token, $resetRecord->token)) {
-            return false;
+            throw new AuthenticateException('Неверный токен для сброса пароля!');
         }
 
         $expiresInMinutes = config('auth.passwords.users.expire', 60);
 
         if (Carbon::parse($resetRecord->created_at)->addMinutes($expiresInMinutes)->isPast()) {
             $this->passwordResetRepository->deleteByEmail($email);
-            return false;
+            throw new TokenExpiredException('Токен для сброса пароля устарел!');
         }
 
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            return false;
+            throw new UserNotFoundException('Пользователь не найден!');
         }
 
         DB::transaction(function () use ($user, $password, $email) {
@@ -121,8 +131,6 @@ class AuthService
         });
 
         $user->notify(new SuccessChangePasswordNotification());
-
-        return true;
     }
 
     public function sendChangeEmailLink(User $user, string $newEmail): void
@@ -133,25 +141,25 @@ class AuthService
         $user->notify(new EmailChangeNewEmailNotification($token));
     }
 
-    public function changeEmail(string $token): bool
+    public function changeEmail(string $token): void
     {
         $tokenObject = $this->emailChangeRepository->findByToken($token);
 
         if (!$tokenObject) {
-            return false;
+            throw new MissingEmailChangeException('Токен для смены email не найден!');
         }
 
         $user = $this->userRepository->findById($tokenObject->user_id);
 
         if (!$user) {
-            return false;
+            throw new UserNotFoundException('Пользователь не найден!');
         }
 
         $expiresInMinutes = config('auth.email_change_expiration', 60);
 
         if (Carbon::parse($tokenObject->created_at)->addMinutes($expiresInMinutes)->isPast()) {
             $this->emailChangeRepository->deleteByUser($user);
-            return false;
+            throw new TokenExpiredException('Токен для смены email устарел!');
         }
 
         DB::transaction(function () use ($user, $tokenObject): void {
@@ -164,15 +172,13 @@ class AuthService
         });
 
         $user->notify(new SuccessChangeEmailNotification());
-
-        return true;
     }
 
     public function invalidateAllUserTokens(User $user): void
     {
-        $tokens = $user->tokens()->pluck('token')->toArray();
+        $tokens = $this->userTokensRepository->getUserTokens($user);
 
-        $user->tokens()->delete();
+        $this->userTokensRepository->deleteUserTokens($user);
 
         foreach ($tokens as $token) {
             try {

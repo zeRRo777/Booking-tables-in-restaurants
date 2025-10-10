@@ -35,7 +35,6 @@ class UserController extends Controller
      * response=200,
      * description="Успешное получение данных о себе",
      * @OA\JsonContent(
-     * @OA\Property(property="user", type="object",
      * @OA\Property(property="id", type="integer", example=1),
      * @OA\Property(property="name", type="string", example="Джон Доу"),
      * @OA\Property(property="email", type="string", format="email", example="john@example.com"),
@@ -43,7 +42,6 @@ class UserController extends Controller
      * @OA\Property(property="is_blocked", type="boolean", example=false),
      * @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
      * @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
-     * ),
      * )
      * ),
      * @OA\Response(
@@ -64,7 +62,7 @@ class UserController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'user' => new UserResource($user)
+            new UserResource($user)
         ]);
     }
 
@@ -87,9 +85,6 @@ class UserController extends Controller
      * response=200,
      * description="Пользователь успешно изменил данные",
      * @OA\JsonContent(
-     * @OA\Property(
-     * property="user",
-     * type="object",
      * @OA\Property(property="id", type="integer", example=1),
      * @OA\Property(property="name", type="string", example="Джон Доу"),
      * @OA\Property(property="email", type="string", format="email", example="john@example.com"),
@@ -97,8 +92,6 @@ class UserController extends Controller
      * @OA\Property(property="is_blocked", type="boolean", example=false),
      * @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
      * @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z")
-     * ),
-     * @OA\Property(property="result", type="boolean", example=true)
      * )
      * ),
      * @OA\Response(
@@ -125,25 +118,28 @@ class UserController extends Controller
      * @OA\Property(property="instance", type="string", example="/api/me")
      * )
      * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/DBexception"),
+     * @OA\Property(property="title", type="string", example="Operation DB error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Operation DB error"),
+     * @OA\Property(property="instance", type="string", example="/api/me"),
+     * )
+     * )
      * )
      */
     public function updateMe(UpdateMeRequest $request): JsonResponse
     {
         $user = $request->user();
 
-        try {
-            $updatedUser = $this->userService->updateUser($user, $request->validated());
+        $updatedUser = $this->userService->updateUser($user, $request->validated());
 
-            return response()->json([
-                'user' => new UserResource($updatedUser),
-                'result' => true
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'result' => false,
-                'message' => 'Произошла ошибка при обновлении данных!'
-            ], 500);
-        }
+        return response()->json([
+            new UserResource($updatedUser),
+        ]);
     }
 
     /**
@@ -170,27 +166,25 @@ class UserController extends Controller
      * ),
      * @OA\Response(
      * response=500,
-     * description="Внутренняя ошибка сервера",
+     * description="Внутрення ошибка сервера",
      * @OA\JsonContent(
-     * @OA\Property(property="message", type="string", example="Произошла ошибка при удалении данных"),
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/DBexception"),
+     * @OA\Property(property="title", type="string", example="Operation DB error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Operation DB error"),
+     * @OA\Property(property="instance", type="string", example="/api/me"),
      * )
-     * )
+     * ),
      * )
      */
     public function deleteMe(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        try {
-            $this->userService->deleteUser($user, true);
-            $this->authService->logout();
+        $this->userService->deleteUser($user, true);
 
-            return response()->json(null, 204);
-        } catch (\Exception $e) {
-            Log::error('Failed to delete user: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Произошла ошибка при удалении данных!'
-            ], 500);
-        }
+        $this->authService->logout();
+
+        return response()->json(null, 204);
     }
 }

@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\DTOs\CreateUserDTO;
+use App\Exceptions\OperationDbException;
+use App\Exceptions\UserUpdateQueryException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -31,23 +34,21 @@ class UserService
         return $dataUser;
     }
 
-    public function updateUser(User $user, array $data): User|bool
+    public function updateUser(User $user, array $data): User
     {
         $result = $this->userRepository->update($user, $data);
 
         if (!$result) {
-            throw new \Exception('Ошибка при обновлении пользователя!');
+            throw new UserUpdateQueryException('Ошибка при обновлении пользователя!', 500);
         }
 
         return $this->userRepository->findById($user->id);
     }
 
-    public function deleteUser(User $user, bool $real = false): bool
+    public function deleteUser(User $user, bool $real = false): void
     {
-        $result = DB::transaction(function () use ($user, $real): bool {
+        DB::transaction(function () use ($user, $real): bool {
             return $this->userRepository->delete($user, $real);
         });
-
-        return $result;
     }
 }

@@ -238,38 +238,6 @@
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "type": {
-                                            "type": "string",
-                                            "example": "https://example.com/errors/token"
-                                        },
-                                        "title": {
-                                            "type": "string",
-                                            "example": "An error occurred while validating token"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "detail": {
-                                            "type": "string",
-                                            "example": "При проверке токена произошла ошибка"
-                                        },
-                                        "instance": {
-                                            "type": "string",
-                                            "example": "/api/login"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -576,38 +544,6 @@
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "type": {
-                                            "type": "string",
-                                            "example": "https://example.com/errors/logout-error"
-                                        },
-                                        "title": {
-                                            "type": "string",
-                                            "example": "Logout Error"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "detail": {
-                                            "type": "string",
-                                            "example": "Не удалось выйти из системы."
-                                        },
-                                        "instance": {
-                                            "type": "string",
-                                            "example": "/api/logout"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
                 },
                 "security": [
@@ -773,38 +709,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "type": {
-                                            "type": "string",
-                                            "example": "https://example.com/errors/password-reset"
-                                        },
-                                        "title": {
-                                            "type": "string",
-                                            "example": "Password reset error"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "detail": {
-                                            "type": "string",
-                                            "example": "Не удалось отправить сообщение на почту."
-                                        },
-                                        "instance": {
-                                            "type": "string",
-                                            "example": "/auth/password/reset"
                                         }
                                     },
                                     "type": "object"
@@ -1179,41 +1083,36 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Джон Доу"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "john@example.com"
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+89123456789"
-                                                },
-                                                "is_blocked": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-10-27T10:00:00.000000Z"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-10-27T10:00:00.000000Z"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Джон Доу"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "john@example.com"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+89123456789"
+                                        },
+                                        "is_blocked": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-10-27T10:00:00.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-10-27T10:00:00.000000Z"
                                         }
                                     },
                                     "type": "object"
@@ -1304,14 +1203,30 @@
                         }
                     },
                     "500": {
-                        "description": "Внутренняя ошибка сервера",
+                        "description": "Внутрення ошибка сервера",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "type": {
                                             "type": "string",
-                                            "example": "Произошла ошибка при удалении данных"
+                                            "example": "https://example.com/errors/DBexception"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Operation DB error"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "500"
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Operation DB error"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/me"
                                         }
                                     },
                                     "type": "object"
@@ -1357,45 +1272,36 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Джон Доу"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "john@example.com"
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+89123456789"
-                                                },
-                                                "is_blocked": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-10-27T10:00:00.000000Z"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2023-10-27T10:00:00.000000Z"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
                                         },
-                                        "result": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Джон Доу"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "john@example.com"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+89123456789"
+                                        },
+                                        "is_blocked": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": false
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-10-27T10:00:00.000000Z"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2023-10-27T10:00:00.000000Z"
                                         }
                                     },
                                     "type": "object"
@@ -1468,6 +1374,38 @@
                                         "detail": {
                                             "type": "string",
                                             "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/me"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутрення ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/DBexception"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Operation DB error"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "500"
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Operation DB error"
                                         },
                                         "instance": {
                                             "type": "string",

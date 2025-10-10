@@ -105,17 +105,6 @@ class AuthController extends Controller
      *         }
      *     )
      * ),
-     * @OA\Response(
-     * response=500,
-     * description="Внутренняя ошибка сервера",
-     * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/token"),
-     * @OA\Property(property="title", type="string", example="An error occurred while validating token"),
-     * @OA\Property(property="status", type="integer", example=500),
-     * @OA\Property(property="detail", type="string", example="При проверке токена произошла ошибка"),
-     * @OA\Property(property="instance", type="string", example="/api/login")
-     * )
-     * ),
      * )
      */
     public function login(LoginRequest $request): JsonResponse
@@ -124,16 +113,6 @@ class AuthController extends Controller
             $request->validated('email'),
             $request->validated('password')
         );
-
-        if (!$user) {
-            return response()->json([
-                'type' => 'https://example.com/errors/unauthorized',
-                'title' => 'Unauthorized',
-                'status' => 401,
-                'detail' => 'Неверные учетные данные.',
-                'instance' => $request->getUri(),
-            ], 401);
-        }
 
         $userToken = $this->authService->createAndSaveToken($user);
 
@@ -265,35 +244,12 @@ class AuthController extends Controller
      * @OA\Property(property="instance", type="string", example="/api/logout")
      * )
      * ),
-     * @OA\Response(
-     * response=500,
-     * description="Внутренняя ошибка сервера",
-     * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/logout-error"),
-     * @OA\Property(property="title", type="string", example="Logout Error"),
-     * @OA\Property(property="status", type="integer", example=500),
-     * @OA\Property(property="detail", type="string", example="Не удалось выйти из системы."),
-     * @OA\Property(property="instance", type="string", example="/api/logout")
-     * )
-     * ),
      * )
      */
     public function logout(): JsonResponse
     {
-        try {
-            $this->authService->logout();
-            return response()->json(['message' => 'Вы успешно вышли из системы.'], 200);
-        } catch (Exception $e) {
-            Log::error('Ошибка при выходе из системы: ' . $e->getMessage());
-
-            return response()->json([
-                'type' => 'https://example.com/errors/logout-error',
-                'title' => 'Logout Error',
-                'status' => 500,
-                'detail' => 'Не удалось выйти из системы.',
-                'instance' => request()->getUri(),
-            ], 500);
-        }
+        $this->authService->logout();
+        return response()->json(['message' => 'Вы успешно вышли из системы.'], 200);
     }
 
     /**
@@ -348,20 +304,9 @@ class AuthController extends Controller
 
         $dataValidated = $request->validated();
 
-        try {
-            $this->authService->changePassword($user, $dataValidated['password'], true);
+        $this->authService->changePassword($user, $dataValidated['password'], true);
 
-            return response()->json(null, 204);
-        } catch (Exception $e) {
-            Log::error('Ошибка при смене пароля: ' . $e->getMessage());
-
-            return response()->json([
-                'type' => 'https://example.com/errors/change-password-error',
-                'title' => 'Change Password Error',
-                'status' => 500,
-                'detail' => 'Не удалось сменить пароль.',
-            ]);
-        }
+        return response()->json(null, 204);
     }
 
     /**
@@ -384,37 +329,15 @@ class AuthController extends Controller
      * @OA\Property(property="message", type="string", example="Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля.")
      * ),
      * ),
-     * @OA\Response(
-     * response=500,
-     * description="Ошибка сервера",
-     * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/password-reset"),
-     * @OA\Property(property="title", type="string", example="Password reset error"),
-     * @OA\Property(property="status", type="integer", example=500),
-     * @OA\Property(property="detail", type="string", example="Не удалось отправить сообщение на почту."),
-     * @OA\Property(property="instance", type="string", example="/auth/password/reset")
-     * )
-     * ),
      * )
      */
     public function preperationResetPassword(PasswordResetRequest $request): JsonResponse
     {
-        try {
-            $this->authService->sendResetLink($request->validated('email'));
+        $this->authService->sendResetLink($request->validated('email'));
 
-            return response()->json([
-                'message' => 'Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля.',
-            ]);
-        } catch (Exception $e) {
-            Log::error('Ошибка при отправке ссылки для сброса пароля: ' . $e->getMessage());
-            return response()->json([
-                'type' => 'https://example.com/errors/password-reset',
-                'title' => 'Password reset error',
-                'status' => 500,
-                'detail' => 'Не удалось отправить сообщение на почту.',
-                'instance' => request()->getUri(),
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Если ваша электронная почта зарегистрирована, вы получите ссылку для сброса пароля.',
+        ]);
     }
 
     /**
@@ -454,21 +377,11 @@ class AuthController extends Controller
     {
         $dataValidated = $request->validated();
 
-        $result = $this->authService->resetPassword(
+        $this->authService->resetPassword(
             $dataValidated['email'],
             $dataValidated['token'],
             $dataValidated['password']
         );
-
-        if (!$result) {
-            return response()->json([
-                'type' => 'https://example.com/errors/validation-error',
-                'title' => 'Validation Error',
-                'status' => 422,
-                'detail' => 'Неверные данные для сброса пароля.',
-                'instance' => request()->getUri(),
-            ]);
-        }
 
         return response()->json(null, 204);
     }
@@ -518,40 +431,17 @@ class AuthController extends Controller
      * @OA\Property(property="instance", type="string", example="/api/auth/email/change")
      * )
      * ),
-     * @OA\Response(
-     * response=500,
-     * description="Ошибка сервера",
-     * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/email-change"),
-     * @OA\Property(property="title", type="string", example="Email change error"),
-     * @OA\Property(property="status", type="integer", example=500),
-     * @OA\Property(property="detail", type="string", example="Ошибка при смене электорнной почты"),
-     * @OA\Property(property="instance", type="string", example="/auth/email/change")
-     * )
-     * ),
      * )
      */
     public function prepareChangeEmail(ChangeEmailUserRequest $request): JsonResponse
     {
         $user = $request->user();
 
-        try {
-            $this->authService->sendChangeEmailLink($user, $request->validated(['new_email']));
+        $this->authService->sendChangeEmailLink($user, $request->validated(['new_email']));
 
-            return response()->json([
-                'message' => 'Если ваша электронная почта существует, вы получите ссылку для смены почты.',
-            ]);
-        } catch (Exception $e) {
-            Log::error('Ошибка при подготовке смены почты: ' . $e->getMessage());
-
-            return response()->json([
-                'type' => 'https://example.com/errors/email-change',
-                'title' => 'Email change error',
-                'status' => 500,
-                'detail' => 'Ошибка при подготовке смены почты',
-                'instance' => request()->getUri(),
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Если ваша электронная почта существует, вы получите ссылку для смены почты.',
+        ]);
     }
 
     /**
@@ -586,17 +476,7 @@ class AuthController extends Controller
      */
     public function changeEmail(ChangeEmailUserConfirmRequest $request): JsonResponse
     {
-        $result = $this->authService->changeEmail($request->validated(['token']));
-
-        if (!$result) {
-            return response()->json([
-                'type' => 'https://example.com/errors/validation-error',
-                'title' => 'Validation Error',
-                'status' => 422,
-                'detail' => 'Неверные данные для смены почты.',
-                'instance' => request()->getUri(),
-            ]);
-        }
+        $this->authService->changeEmail($request->validated(['token']));
 
         return response()->json(null, 204);
     }

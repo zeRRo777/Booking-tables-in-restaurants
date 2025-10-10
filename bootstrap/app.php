@@ -3,6 +3,7 @@
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,7 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'type'   => 'https://example.com/errors/validation-error',
+                    'type'   => config('app.url') . '/errors/validation-error',
                     'title'  => 'Validation Error',
                     'status' => 422,
                     'detail' => 'Произошла одна или несколько ошибок проверки.',
@@ -39,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'type' => 'https://example.com/errors/unauthorized',
+                    'type' => config('app.url') . '/errors/unauthorized',
                     'title' => 'You not authorized',
                     'status' => 401,
                     'detail' => 'Доступ к ресурсу доступен только авторизованным пользователям!',
@@ -50,12 +51,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AccessDeniedException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'type'     => 'https://example.com/errors/forbidden',
+                    'type'     => config('app.url') . '/errors/forbidden',
                     'title'    => 'You not authorized',
                     'status'   => 403,
                     'detail'   => 'Доступ к ресурсу запрещен!',
                     'instance' => $request->getUri(),
                 ], 403);
+            }
+        });
+        $exceptions->render(function (QueryException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'type' => config('app.url') . '/errors/database-error',
+                    'title' => 'Database Error',
+                    'status' => 500,
+                    'detail' => 'Произошла ошибка базы данных!',
+                    'instance' => $request->getUri(),
+                ], 500);
             }
         });
     })->create();
