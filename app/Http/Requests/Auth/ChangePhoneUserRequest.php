@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\DTOs\CreateUserDTO;
+use App\Rules\PasswordCheck;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterUserRequest extends FormRequest
+class ChangePhoneUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,25 +23,16 @@ class RegisterUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'unique:users,email', 'max:50'],
-            'password' => ['required', 'min:8', 'confirmed'],
-            'name' => ['required', 'max:100', 'string'],
-            'phone' => ['required', 'max:12', 'regex:/^\+\d{11}$/', 'unique:users,phone'],
+            'new_phone' => ['required', 'string', 'max:12', 'regex:/^\+\d{11}$/', 'unique:users,phone'],
+            'password' => ['required', 'string', new PasswordCheck()],
         ];
-    }
-
-    public function toDTO(): CreateUserDTO
-    {
-        return CreateUserDTO::from($this->validated());
     }
 
     public function attributes(): array
     {
         return [
-            'email' => 'Почта',
+            'new_phone' => 'Новый телефон',
             'password' => 'Пароль',
-            'name' => 'Имя',
-            'phone' => 'Телефон'
         ];
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\ChangeEmailUserConfirmRequest;
 use App\Http\Requests\Auth\ChangeEmailUserRequest;
+use App\Http\Requests\Auth\ChangePhoneUserConfirmRequest;
+use App\Http\Requests\Auth\ChangePhoneUserRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\PasswordResetConfirmRequest;
 use App\Http\Requests\Auth\PasswordResetRequest;
@@ -11,9 +13,7 @@ use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Services\UserService;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -477,6 +477,96 @@ class AuthController extends Controller
     public function changeEmail(ChangeEmailUserConfirmRequest $request): JsonResponse
     {
         $this->authService->changeEmail($request->validated(['token']));
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/phone/change",
+     * tags={"Auth"},
+     * summary="Подгтовка к смене номера телефона пользователя",
+     * description="Подгтовка к смене номера телефона пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для смены телефона",
+     * @OA\JsonContent(
+     * @OA\Property(property="new_phone", type="string", example="+79991552423"),
+     * @OA\Property(property="password", type="string", example="password"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=202,
+     * description="Код успешно отрпвлен на почту",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Данные не верны",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://bookingService/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Неверные данные"),
+     * @OA\Property(property="instance", type="string", example="/api/auth/phone/change")
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/auth/phone/change")
+     * )
+     * ),
+     * )
+     */
+    public function prepareChangePhone(ChangePhoneUserRequest $request): JsonResponse
+    {
+        $this->authService->sendChangePhoneCode(
+            $request->user(),
+            $request->validated(['new_phone'])
+        );
+
+        return response()->json(null, 202);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/auth/phone/change/confirm",
+     * tags={"Auth"},
+     * summary="Подтверждение смены номера телефона пользователя",
+     * description="Подтверждение смены номера телефона пользователя",
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для смены почты",
+     * @OA\JsonContent(
+     * @OA\Property(property="code", type="string", example="111333"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно сменил номер телефона",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Данные не верны",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://bookingService/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Неверные данные для смены почты."),
+     * @OA\Property(property="instance", type="string", example="/auth/phone/change/confirm")
+     * )
+     * ),
+     * )
+     */
+    public function changePhone(ChangePhoneUserConfirmRequest $request): JsonResponse
+    {
+        $this->authService->changePhone($request->user(), $request->validated(['code']));
 
         return response()->json(null, 204);
     }

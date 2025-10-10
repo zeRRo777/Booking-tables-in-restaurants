@@ -904,38 +904,6 @@
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "type": {
-                                            "type": "string",
-                                            "example": "https://example.com/errors/email-change"
-                                        },
-                                        "title": {
-                                            "type": "string",
-                                            "example": "Email change error"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "detail": {
-                                            "type": "string",
-                                            "example": "Ошибка при смене электорнной почты"
-                                        },
-                                        "instance": {
-                                            "type": "string",
-                                            "example": "/auth/email/change"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
                     }
                 },
                 "security": [
@@ -999,6 +967,175 @@
                                         "instance": {
                                             "type": "string",
                                             "example": "/auth/email/change/confirm"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/phone/change": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Подгтовка к смене номера телефона пользователя",
+                "description": "Подгтовка к смене номера телефона пользователя",
+                "operationId": "43f95b49eeea679bc9c110d5396faa55",
+                "requestBody": {
+                    "description": "Данные для смены телефона",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "new_phone": {
+                                        "type": "string",
+                                        "example": "+79991552423"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Код успешно отрпвлен на почту"
+                    },
+                    "422": {
+                        "description": "Данные не верны",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://bookingService/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Неверные данные"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/auth/phone/change"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Вы не авторизованы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/unauthorized"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/auth/phone/change"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/phone/change/confirm": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Подтверждение смены номера телефона пользователя",
+                "description": "Подтверждение смены номера телефона пользователя",
+                "operationId": "094291b6d2b2bf52a5a6b65d4d9ab004",
+                "requestBody": {
+                    "description": "Данные для смены почты",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "111333"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Пользователь успешно сменил номер телефона"
+                    },
+                    "422": {
+                        "description": "Данные не верны",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://bookingService/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Неверные данные для смены почты."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/auth/phone/change/confirm"
                                         }
                                     },
                                     "type": "object"

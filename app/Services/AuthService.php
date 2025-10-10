@@ -6,7 +6,7 @@ use App\DTOs\CreateUserTokenDTO;
 use App\Exceptions\AuthenticateException;
 use App\Exceptions\MissingEmailChangeException;
 use App\Exceptions\MissingPasswordResetTokenException;
-use App\Exceptions\OperationDbException;
+use App\Exceptions\MissingPhoneChangeCodeException;
 use App\Exceptions\TokenExpiredException;
 use App\Exceptions\UserNotFoundException;
 use App\Models\User;
@@ -16,13 +16,14 @@ use App\Notifications\EmailChangeOldEmailNotification;
 use App\Notifications\PasswordResetNofication;
 use App\Notifications\SuccessChangeEmailNotification;
 use App\Notifications\SuccessChangePasswordNotification;
+use App\Notifications\SuccessChangePhoneNotification;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
+use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\UserTokensRepositoryInterface;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +37,7 @@ class AuthService
         protected PasswordResetRepositoryInterface $passwordResetRepository,
         protected EmailChangeRepositoryInterface $emailChangeRepository,
         protected UserTokensRepositoryInterface $userTokensRepository,
+        protected PhoneChangeRepositoryInterface $phoneChangeRepository
     ) {}
 
     public function createAndSaveToken(User $user): UserToken
@@ -187,5 +189,48 @@ class AuthService
                 Log::warning('JWT Token invalidation failed for user ' . $user->id . ': ' . $e->getMessage());
             }
         }
+    }
+
+    public function sendChangePhoneCode(User $user, string $phone): void
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $this->phoneChangeRepository->createOrUpdate(
+            $user,
+            Hash::make($code),
+            $phone
+        );
+
+        //sms с кодом на телефон
+    }
+
+    public function changePhone(User $user, string $code): void
+    {
+        $codeObject = $this->phoneChangeRepository->findByUser($user);
+
+        if (!$codeObject) {
+            throw new MissingPhoneChangeCodeException('Не найден код для смены телефона!');
+        }
+
+        if (!Hash::check($code, $codeObject->code)) {
+            throw new AuthenticateException('Неверный код для смены телефона!');
+        }
+
+        $expiresInMinutes = config('auth.email_change_expiration', 10);
+
+        if (Carbon::parse($codeObject->created_at)->addMinutes($expiresInMinutes)->isPast()) {
+            $this->phoneChangeRepository->deleteByUser($user);
+            throw new TokenExpiredException('Токен для смены телефона устарел!');
+        }
+
+        DB::transaction(function () use ($user, $codeObject): void {
+            $this->userRepository->update($user, [
+                'phone' => $codeObject->new_phone,
+                'phone_verified_at' => Carbon::now(),
+            ]);
+            $this->phoneChangeRepository->deleteByUser($user);
+        });
+
+        $user->notify(new SuccessChangePhoneNotification());
     }
 }

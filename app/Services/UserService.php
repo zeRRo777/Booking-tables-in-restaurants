@@ -3,13 +3,10 @@
 namespace App\Services;
 
 use App\DTOs\CreateUserDTO;
-use App\Exceptions\OperationDbException;
 use App\Exceptions\UserUpdateQueryException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

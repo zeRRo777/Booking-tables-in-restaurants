@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
+use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\UserTokensRepositoryInterface;
 use App\Repositories\Eloquent\EloquentEmailChangeRepository;
 use App\Repositories\Eloquent\EloquentPasswordResetRepository;
+use App\Repositories\Eloquent\EloquentPhoneChangeRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
 use App\Repositories\Eloquent\EloquentUserTokensRepository;
 use Illuminate\Support\Facades\Artisan;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PasswordResetRepositoryInterface::class, EloquentPasswordResetRepository::class);
         $this->app->bind(EmailChangeRepositoryInterface::class, EloquentEmailChangeRepository::class);
         $this->app->bind(UserTokensRepositoryInterface::class, EloquentUserTokensRepository::class);
+        $this->app->bind(PhoneChangeRepositoryInterface::class, EloquentPhoneChangeRepository::class);
     }
 
     /**
