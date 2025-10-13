@@ -43,6 +43,8 @@ Route::middleware('throttle:api')->group(function () {
         Route::controller(VerifyController::class)->group(function () {
             Route::post('/verify/email/send', 'prepareEmailVerify');
             Route::post('/verify/email/confirm', 'verifyEmail');
+            Route::post('/verify/phone/send', 'preparePhoneVerify');
+            Route::post('/verify/phone/confirm', 'verifyPhone');
         });
     });
 
