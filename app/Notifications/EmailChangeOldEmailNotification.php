@@ -36,6 +36,7 @@ class EmailChangeOldEmailNotification extends Notification implements ShouldQueu
     {
         return (new MailMessage)
             ->greeting('Здравствуйте!')
+            ->subject('Уведомление о смене электронной почты')
             ->line('Уведомление о смене электоронной почты')
             ->line('Вы получили данное письмо, потому что поступил запрос на смену данной электоронной почты')
             ->line('Если вы не запрашивали смену электронной почты, то напишите нам на почту для отмены действия: ' . config('app.support_email'));

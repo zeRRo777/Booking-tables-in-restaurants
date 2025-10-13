@@ -1561,6 +1561,281 @@
                     }
                 ]
             }
+        },
+        "/verify/email/send": {
+            "post": {
+                "tags": [
+                    "Verify"
+                ],
+                "summary": "Отправка кода подтверждения на почту пользователя для подтверждения почты",
+                "description": "Отправка кода подтверждения на почту пользователя для подтверждения почты",
+                "operationId": "e8c4cbaaa4fa5c30737a7d83c026ed0a",
+                "responses": {
+                    "200": {
+                        "description": "Пользователь успешно вышел из системы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Код верификации отправлен на вашу почту"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Вы не авторизованы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/unauthorized"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/send"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка верификации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/user-already-verfied"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "User already verfied"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "User already verfied"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/send"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/database-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Database Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка базы данных!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/send"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/verify/email/confirm": {
+            "post": {
+                "tags": [
+                    "Verify"
+                ],
+                "summary": "Подтверждение почты пользователя",
+                "description": "Подтверждение почты пользователя",
+                "operationId": "b67133fdb57f2786ad8787559d997c59",
+                "requestBody": {
+                    "description": "Данные для смены подтверждения почты",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "111111"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Пользователь успешно подтвердил почту",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email успешно подтвержден"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Вы не авторизованы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/unauthorized"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/confirm"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка верификации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/user-already-verfied"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "User already verfied"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "User already verfied"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/confirm"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/database-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Database Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка базы данных!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/verify/email/send"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1582,6 +1857,10 @@
         {
             "name": "ME",
             "description": "API для получение информации о пользователе"
+        },
+        {
+            "name": "Verify",
+            "description": "API для подтверждения почты и телефона"
         },
         {
             "name": "Health",

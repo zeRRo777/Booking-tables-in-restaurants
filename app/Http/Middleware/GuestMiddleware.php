@@ -16,7 +16,7 @@ class GuestMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
+        if ($request->user()) {
             return response()->json([
                 'type'   => 'https://example.com/errors/already-authenticated',
                 'title'  => 'Already Authenticated',

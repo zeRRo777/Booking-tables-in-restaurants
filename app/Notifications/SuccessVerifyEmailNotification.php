@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SuccessChangeEmailNotification extends Notification implements ShouldQueue
+class SuccessVerifyEmailNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -36,9 +36,9 @@ class SuccessChangeEmailNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->greeting('Здравствуйте!')
-            ->subject('Уведомление о смене электронной почты')
-            ->line('Уведомление о смене электоронной почты')
-            ->line('Вы получили данное письмо, потому что вы успешно сменили свою электронную почту.');
+            ->subject('Уведомление о подтверждении электронной почты')
+            ->line('Уведомление о подтверждении электронной почты')
+            ->line('Вы получили данное письмо, потому что вы успешно подтвердили свою электронную почту.');
     }
 
     /**

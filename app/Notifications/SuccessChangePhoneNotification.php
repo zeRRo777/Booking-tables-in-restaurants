@@ -36,6 +36,7 @@ class SuccessChangePhoneNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->greeting('Здравствуйте!')
+            ->subject('Уведомление о смене номера телефона')
             ->line('Уведомление о смене номера телефона')
             ->line('Вы получили данное письмо, потому что вы успешно сменили свой номер телефона.');
     }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use Illuminate\Support\Facades\Route;
@@ -12,17 +13,18 @@ Route::middleware('throttle:api')->group(function () {
 
     Route::middleware(GuestMiddleware::class)->group(function () {
 
-        Route::post('/auth/register', [AuthController::class, 'register']);
+        Route::controller(AuthController::class)->group(function () {
+            Route::post('/auth/register', 'register');
 
-        Route::post('/auth/login', [AuthController::class, 'login']);
+            Route::post('/auth/login', 'login');
 
-        Route::post('/auth/password/reset', [AuthController::class, 'preperationResetPassword']);
+            Route::post('/auth/password/reset',  'preperationResetPassword');
 
-        Route::post('/auth/password/reset/confirm', [AuthController::class, 'resetPassword']);
+            Route::post('/auth/password/reset/confirm', 'resetPassword');
+        });
     });
 
     Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function () {
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
 
         Route::controller(UserController::class)->group(function () {
             Route::get('/me', 'profile');
@@ -30,10 +32,18 @@ Route::middleware('throttle:api')->group(function () {
             Route::delete('/me', 'deleteMe');
         });
 
-        Route::post('/auth/email/change', [AuthController::class, 'prepareChangeEmail']);
-        Route::post('/auth/password/change', [AuthController::class, 'changePassword']);
-        Route::post('/auth/phone/change', [AuthController::class, 'prepareChangePhone']);
-        Route::post('/auth/phone/change/confirm', [AuthController::class, 'changePhone']);
+        Route::controller(AuthController::class)->group(function () {
+            Route::post('/auth/email/change', 'prepareChangeEmail');
+            Route::post('/auth/password/change', 'changePassword');
+            Route::post('/auth/phone/change', 'prepareChangePhone');
+            Route::post('/auth/phone/change/confirm', 'changePhone');
+            Route::post('/auth/logout', 'logout');
+        });
+
+        Route::controller(VerifyController::class)->group(function () {
+            Route::post('/verify/email/send', 'prepareEmailVerify');
+            Route::post('/verify/email/confirm', 'verifyEmail');
+        });
     });
 
     Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);

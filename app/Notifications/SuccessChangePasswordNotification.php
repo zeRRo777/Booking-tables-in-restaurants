@@ -41,6 +41,7 @@ class SuccessChangePasswordNotification extends Notification implements ShouldQu
 
         return (new MailMessage)
             ->greeting('Здравствуйте!')
+            ->subject('Уведомление о смене пароля')
             ->line('Уведомления о успешной смене пароля')
             ->line('Вы получили данное письмо, потому что сменили пароль')
             ->line('Если вы не меняли пароль, то вы можете сбросить пароль и установить новый')

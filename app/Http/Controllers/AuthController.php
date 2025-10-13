@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\ChangeEmailUserConfirmRequest;
 use App\Http\Requests\Auth\ChangeEmailUserRequest;
+use App\Http\Requests\Auth\ChangePasswordUserRequest;
 use App\Http\Requests\Auth\ChangePhoneUserConfirmRequest;
 use App\Http\Requests\Auth\ChangePhoneUserRequest;
 use App\Http\Requests\Auth\LoginRequest;
@@ -298,7 +299,7 @@ class AuthController extends Controller
      * ),
      * )
      */
-    public function changePassword(ChangeEmailUserRequest $request): JsonResponse
+    public function changePassword(ChangePasswordUserRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -526,9 +527,11 @@ class AuthController extends Controller
      */
     public function prepareChangePhone(ChangePhoneUserRequest $request): JsonResponse
     {
+        $data = $request->validated();
+
         $this->authService->sendChangePhoneCode(
             $request->user(),
-            $request->validated(['new_phone'])
+            $data['new_phone']
         );
 
         return response()->json(null, 202);
