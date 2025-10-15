@@ -83,4 +83,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->phone_verified_at !== null;
     }
+
+    public function hasRole(string $roleName): bool
+    {
+        return $this->roles->contains('name', $roleName);
+    }
 }

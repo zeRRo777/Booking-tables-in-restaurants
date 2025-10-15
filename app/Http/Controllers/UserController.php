@@ -122,13 +122,13 @@ class UserController extends Controller
      * response=500,
      * description="Внутрення ошибка сервера",
      * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/DBexception"),
-     * @OA\Property(property="title", type="string", example="Operation DB error"),
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
      * @OA\Property(property="status", type="string", example="500"),
-     * @OA\Property(property="detail", type="string", example="Operation DB error"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
      * @OA\Property(property="instance", type="string", example="/api/me"),
      * )
-     * )
+     * ),
      * )
      */
     public function updateMe(UpdateMeRequest $request): JsonResponse
@@ -168,10 +168,10 @@ class UserController extends Controller
      * response=500,
      * description="Внутрення ошибка сервера",
      * @OA\JsonContent(
-     * @OA\Property(property="type", type="string", example="https://example.com/errors/DBexception"),
-     * @OA\Property(property="title", type="string", example="Operation DB error"),
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
      * @OA\Property(property="status", type="string", example="500"),
-     * @OA\Property(property="detail", type="string", example="Operation DB error"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
      * @OA\Property(property="instance", type="string", example="/api/me"),
      * )
      * ),

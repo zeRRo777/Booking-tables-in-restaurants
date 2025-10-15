@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\ForceJsonResponse;
-use App\Http\Middleware\ValidateTokenInDatabase;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
@@ -12,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -25,6 +25,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->throttleWithRedis();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+
+        $renderForbiddenResponse = function (Request $request): JsonResponse {
+            return response()->json([
+                'type'     => config('app.url') . '/errors/forbidden',
+                'title'    => 'You not authorized',
+                'status'   => 403,
+                'detail'   => 'Доступ к ресурсу запрещен!',
+                'instance' => $request->getUri(),
+            ], 403);
+        };
+
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
@@ -48,15 +59,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 401);
             }
         });
-        $exceptions->render(function (AccessDeniedException $e, Request $request) {
+        $exceptions->render(function (AccessDeniedException $e, Request $request) use ($renderForbiddenResponse) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'type'     => config('app.url') . '/errors/forbidden',
-                    'title'    => 'You not authorized',
-                    'status'   => 403,
-                    'detail'   => 'Доступ к ресурсу запрещен!',
-                    'instance' => $request->getUri(),
-                ], 403);
+                return $renderForbiddenResponse($request);
+            }
+        });
+        $exceptions->render(function (AuthorizationException $e, Request $request) use ($renderForbiddenResponse) {
+            if ($request->is('api/*')) {
+                return $renderForbiddenResponse($request);
+            }
+        });
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) use ($renderForbiddenResponse) {
+            if ($request->is('api/*')) {
+                return $renderForbiddenResponse($request);
             }
         });
         $exceptions->render(function (QueryException $e, Request $request) {

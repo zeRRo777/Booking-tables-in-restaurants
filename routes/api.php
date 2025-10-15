@@ -1,19 +1,21 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
+use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('throttle:api')->group(function () {
+Route::middleware('throttle:api')->group(function (): void {
     Route::get('/health', [TestController::class, 'health']);
 
-    Route::middleware(GuestMiddleware::class)->group(function () {
+    Route::middleware(GuestMiddleware::class)->group(function (): void {
 
-        Route::controller(AuthController::class)->group(function () {
+        Route::controller(AuthController::class)->group(function (): void {
             Route::post('/auth/register', 'register');
 
             Route::post('/auth/login', 'login');
@@ -24,15 +26,15 @@ Route::middleware('throttle:api')->group(function () {
         });
     });
 
-    Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function () {
+    Route::middleware(['auth:api', ValidateTokenInDatabase::class])->group(function (): void {
 
-        Route::controller(UserController::class)->group(function () {
+        Route::controller(UserController::class)->group(function (): void {
             Route::get('/me', 'profile');
             Route::patch('/me', 'updateMe');
             Route::delete('/me', 'deleteMe');
         });
 
-        Route::controller(AuthController::class)->group(function () {
+        Route::controller(AuthController::class)->group(function (): void {
             Route::post('/auth/email/change', 'prepareChangeEmail');
             Route::post('/auth/password/change', 'changePassword');
             Route::post('/auth/phone/change', 'prepareChangePhone');
@@ -40,11 +42,19 @@ Route::middleware('throttle:api')->group(function () {
             Route::post('/auth/logout', 'logout');
         });
 
-        Route::controller(VerifyController::class)->group(function () {
+        Route::controller(VerifyController::class)->group(function (): void {
             Route::post('/verify/email/send', 'prepareEmailVerify');
             Route::post('/verify/email/confirm', 'verifyEmail');
             Route::post('/verify/phone/send', 'preparePhoneVerify');
             Route::post('/verify/phone/confirm', 'verifyPhone');
+        });
+
+        Route::controller(RoleController::class)->group(function (): void {
+            Route::get('/roles', 'index')->can('viewAny', Role::class);
+            Route::get('/roles/{id}', 'show')->can('view', Role::class);
+            Route::post('/roles', 'store')->can('create', Role::class);
+            Route::patch('/roles/{id}', 'update')->can('update', Role::class);
+            Route::delete('/roles/{id}', 'destroy')->can('delete', Role::class);
         });
     });
 
