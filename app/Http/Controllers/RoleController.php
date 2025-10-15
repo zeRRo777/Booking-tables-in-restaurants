@@ -57,7 +57,7 @@ class RoleController extends Controller
      * @OA\Property(property="instance", type="string", example="/api/logout")
      * )
      * ),
-     * * @OA\Response(
+     * @OA\Response(
      * response=403,
      * description="Вы не авторизованы",
      * @OA\JsonContent(

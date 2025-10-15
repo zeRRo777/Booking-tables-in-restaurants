@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UsersCollection;
 use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * @OA\Tag(
  * name="ME",
  * description="API для получение информации о пользователе"
+ * )
+ * * @OA\Tag(
+ * name="Users",
+ * description="API для управления другими пользователями (административные функции)"
  * )
  */
 class UserController extends Controller
@@ -186,5 +192,120 @@ class UserController extends Controller
         $this->authService->logout();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\GET(
+     * path="/users",
+     * tags={"Users"},
+     * summary="Получение списка пользователей",
+     * description="Получение списка всех пользователей. Доступно только администраторам.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="name",
+     * in="query",
+     * description="Поиск по имени",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="email",
+     * in="query",
+     * description="Поиск по email",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="phone",
+     * in="query",
+     * description="Поиск по phone",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="is_blocked",
+     * in="query",
+     * description="Фильтрация по статусу блокировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"true", "false"},
+     * default="false"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка пользователей",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив пользователей",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/users")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users")
+     * )
+     * ),
+     * )
+     */
+    public function index(IndexRequest $request): UsersCollection
+    {
+        $filterDto = $request->toDto();
+
+        $users = $this->userService->getUsers($filterDto);
+
+        return new UsersCollection($users);
     }
 }

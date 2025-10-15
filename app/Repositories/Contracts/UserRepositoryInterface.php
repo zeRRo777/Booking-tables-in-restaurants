@@ -4,8 +4,10 @@ namespace App\Repositories\Contracts;
 
 use App\DTOs\CreateUserDTO;
 use App\DTOs\CreateUserTokenDTO;
+use App\DTOs\UserFilterDTO;
 use App\Models\User;
 use App\Models\UserToken;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface UserRepositoryInterface
 {
@@ -22,4 +24,6 @@ interface UserRepositoryInterface
     public function update(User $user, array $data): bool;
 
     public function delete(User $user, bool $real = false): bool;
+
+    public function getFiltered(UserFilterDTO $dto): LengthAwarePaginator;
 }

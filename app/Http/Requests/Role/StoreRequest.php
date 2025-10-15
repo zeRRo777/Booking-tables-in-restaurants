@@ -25,4 +25,11 @@ class StoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:50', 'unique:roles,name']
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Название'
+        ];
+    }
 }

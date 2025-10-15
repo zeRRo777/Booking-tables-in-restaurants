@@ -26,4 +26,11 @@ class UpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:50', Rule::unique('roles')->ignore($this->route('id'))],
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => 'Название'
+        ];
+    }
 }

@@ -4,9 +4,11 @@ namespace App\Repositories\Eloquent;
 
 use App\DTOs\CreateUserDTO;
 use App\DTOs\CreateUserTokenDTO;
+use App\DTOs\UserFilterDTO;
 use App\Models\User;
 use App\Models\UserToken;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 
 class EloquentUserRepository implements UserRepositoryInterface
@@ -53,5 +55,28 @@ class EloquentUserRepository implements UserRepositoryInterface
     public function delete(User $user, bool $real = false): bool
     {
         return $real ? $user->forceDelete() : $user->delete();
+    }
+
+    public function getFiltered(UserFilterDTO $dto): LengthAwarePaginator
+    {
+        $query = User::query();
+
+        $query->when($dto->name, function ($q) use ($dto) {
+            $q->where('name', 'like', "%{$dto->name}%");
+        });
+
+        $query->when($dto->email, function ($q) use ($dto) {
+            $q->where('email', 'like', "%{$dto->email}%");
+        });
+
+        $query->when($dto->phone, function ($q) use ($dto) {
+            $q->where('phone', 'like', "%{$dto->phone}%");
+        });
+
+        $query->when(!is_null($dto->is_blocked), function ($q) use ($dto) {
+            $q->where('is_blocked', $dto->is_blocked);
+        });
+
+        return $query->paginate($dto->per_page);
     }
 }

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\DTOs\CreateUserDTO;
+use App\DTOs\UserFilterDTO;
 use App\Exceptions\UserUpdateQueryException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -47,5 +49,10 @@ class UserService
         DB::transaction(function () use ($user, $real): bool {
             return $this->userRepository->delete($user, $real);
         });
+    }
+
+    public function getUsers(UserFilterDTO $dto): LengthAwarePaginator
+    {
+        return $this->userRepository->getFiltered($dto);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:api')->group(function (): void {
@@ -32,6 +33,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/me', 'profile');
             Route::patch('/me', 'updateMe');
             Route::delete('/me', 'deleteMe');
+            Route::get('/users', 'index')->can('viewAny', User::class);
         });
 
         Route::controller(AuthController::class)->group(function (): void {
