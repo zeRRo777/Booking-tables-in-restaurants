@@ -17,21 +17,18 @@ class UserService
 {
     public function __construct(
         protected UserRepositoryInterface $userRepository,
-        protected AuthService $authService,
     ) {}
 
-    public function createUser(CreateUserDTO $dto): array
+    public function createUser(CreateUserDTO $dto): User
     {
-        $dataUser = DB::transaction(function () use ($dto): array {
+        $user = DB::transaction(function () use ($dto): User {
             $user = $this->userRepository->create($dto);
             $user->roles()->attach(Role::where('name', 'user')->first());
-
-            $token = $this->authService->createAndSaveToken($user);
             Log::info('Новый пользователь создан успешно', ['user_id' => $user->id]);
-            return ['user' => $user, 'token' => $token->token];
+            return $user;
         });
 
-        return $dataUser;
+        return $user;
     }
 
     public function updateUser(User $user, array $data): User

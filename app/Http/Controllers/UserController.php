@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Resources\UserResource;
@@ -10,7 +11,6 @@ use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * @OA\Tag(
@@ -357,7 +357,7 @@ class UserController extends Controller
      * ),
      * @OA\Response(
      * response=403,
-     * description="Вы не авторизованы",
+     * description="Нет прав",
      * @OA\JsonContent(
      * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
      * @OA\Property(property="title", type="string", example="You not authorized"),
@@ -384,5 +384,84 @@ class UserController extends Controller
         $user = $this->userService->getUser($id);
 
         return new UserResource($user);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/users",
+     * tags={"Users"},
+     * summary="Добавление нового пользователя",
+     * description="Создает нового пользователя и возвращает его данные",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"email", "password", "password_confirmation", "name", "phone"},
+     * @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     * @OA\Property(property="password", type="string", format="password", example="password123"),
+     * @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+     * @OA\Property(property="name", type="string", example="Джон Доу"),
+     * @OA\Property(property="phone", type="string", example="+89123456789")
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Пользователь успешно зарегистрирован",
+     * @OA\JsonContent(
+     * @OA\Property(property="user", type="object",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Джон Доу"),
+     * @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     * @OA\Property(property="phone", type="string", example="+89123456789"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/users"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутренняя ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/token"),
+     * @OA\Property(property="title", type="string", example="An error occurred while validating token"),
+     * @OA\Property(property="status", type="integer", example=500),
+     * @OA\Property(property="detail", type="string", example="При проверке токена произошла ошибка"),
+     * @OA\Property(property="instance", type="string", example="/api/users")
+     * )
+     * ),
+     * )
+     */
+    public function store(RegisterUserRequest $request): UserResource
+    {
+        $userDto = $request->toDto();
+
+        $newUser = $this->userService->createUser($userDto);
+
+        return new UserResource($newUser);
     }
 }

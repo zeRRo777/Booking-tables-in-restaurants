@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\CreateUserDTO;
 use App\DTOs\CreateUserTokenDTO;
 use App\Exceptions\AuthenticateException;
 use App\Exceptions\MissingEmailChangeException;
@@ -37,7 +38,8 @@ class AuthService
         protected PasswordResetRepositoryInterface $passwordResetRepository,
         protected EmailChangeRepositoryInterface $emailChangeRepository,
         protected UserTokensRepositoryInterface $userTokensRepository,
-        protected PhoneChangeRepositoryInterface $phoneChangeRepository
+        protected PhoneChangeRepositoryInterface $phoneChangeRepository,
+        protected UserService $userService,
     ) {}
 
     public function createAndSaveToken(User $user): UserToken
@@ -232,5 +234,19 @@ class AuthService
         });
 
         $user->notify(new SuccessChangePhoneNotification());
+    }
+
+    public function register(CreateUserDTO $dto): array
+    {
+        $dataUser = DB::transaction(function () use ($dto): array {
+            $user = $this->userService->createUser($dto);
+            $token = $this->createAndSaveToken($user);
+            return [
+                'token' => $token->token,
+                'user' => $user
+            ];
+        });
+
+        return $dataUser;
     }
 }

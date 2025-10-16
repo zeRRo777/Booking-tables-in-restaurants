@@ -209,14 +209,11 @@ class AuthController extends Controller
     {
         $userDTO = $request->toDTO();
 
-        $data = $this->userService->createUser($userDTO);
-
-        $user = $data['user'];
-        $token = $data['token'];
+        $data = $this->authService->register($userDTO);
 
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token,
+            'user' => new UserResource($data['user']),
+            'token' => $data['token'],
         ], 201);
     }
 
