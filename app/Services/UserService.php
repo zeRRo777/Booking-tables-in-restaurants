@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\CreateUserDTO;
 use App\DTOs\UserFilterDTO;
+use App\Exceptions\UserNotFoundException;
 use App\Exceptions\UserUpdateQueryException;
 use App\Models\Role;
 use App\Models\User;
@@ -54,5 +55,16 @@ class UserService
     public function getUsers(UserFilterDTO $dto): LengthAwarePaginator
     {
         return $this->userRepository->getFiltered($dto);
+    }
+
+    public function getUser(int $id): User
+    {
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            throw new UserNotFoundException('Пользователь не найден!');
+        }
+
+        return $user;
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class UserNotFoundException extends Exception
 {
-    public function __construct($message = "", $code = 400)
+    public function __construct($message = "", $code = 404)
     {
         parent::__construct($message, $code);
     }

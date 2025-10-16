@@ -308,4 +308,81 @@ class UserController extends Controller
 
         return new UsersCollection($users);
     }
+
+    /**
+     * @OA\GET(
+     * path="/users/{id}",
+     * tags={"Users"},
+     * summary="Получение пользователя по id",
+     * description="Получение пользователя по id",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID пользователя для получения",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка пользователей",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект пользователя",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * )
+     */
+    public function show(int $id): UserResource
+    {
+        $user = $this->userService->getUser($id);
+
+        return new UserResource($user);
+    }
 }
