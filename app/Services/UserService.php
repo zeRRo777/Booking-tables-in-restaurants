@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\DTOs\Contracts\UpdateUserDtoInterface;
 use App\DTOs\CreateUserDTO;
+use App\DTOs\UpdateUserDTO;
 use App\DTOs\UserFilterDTO;
 use App\Exceptions\UserNotFoundException;
 use App\Exceptions\UserUpdateQueryException;
@@ -31,15 +33,30 @@ class UserService
         return $user;
     }
 
-    public function updateUser(User $user, array $data): User
+    public function updateUser(int $userId, UpdateUserDtoInterface $dto): User
     {
-        $result = $this->userRepository->update($user, $data);
+        $user = $this->getUser($userId);
 
-        if (!$result) {
-            throw new UserUpdateQueryException('Ошибка при обновлении пользователя!', 500);
+        $data = array_filter(
+            $dto->toArray(),
+            fn($value) => !is_null($value)
+        );
+
+        if (empty($data)) {
+            return $user;
         }
 
-        return $this->userRepository->findById($user->id);
+        if (isset($data['email'])) {
+            $data['email_verified_at'] = null;
+        }
+
+        if (isset($data['phone'])) {
+            $data['phone_verified_at'] = null;
+        }
+
+        $this->userRepository->update($user, $data);
+
+        return $user->refresh();
     }
 
     public function deleteUser(User $user, bool $real = false): void

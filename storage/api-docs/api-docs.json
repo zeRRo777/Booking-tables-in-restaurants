@@ -3043,6 +3043,218 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Изменение данных пользователя",
+                "description": "Изменение данных пользователя",
+                "operationId": "6055962f27a3fb88a3445c27693dcf5f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID пользователя",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Джон Доу"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+89123456789"
+                                    },
+                                    "is_blocked": {
+                                        "type": "string",
+                                        "example": "true"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Пользователь успешно изменен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Джон Доу"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "john@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+89123456789"
+                                                },
+                                                "is_blocked": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2023-10-27T10:00:00.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2023-10-27T10:00:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла одна или несколько ошибок проверки."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/users/1"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Поле email обязательно для заполнения."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/users/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутрення ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/database-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Database Error"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "500"
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка базы данных!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/users/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/verify/email/send": {

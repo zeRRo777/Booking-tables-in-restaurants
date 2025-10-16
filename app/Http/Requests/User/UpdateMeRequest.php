@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\DTOs\UpdateMeDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMeRequest extends FormRequest
@@ -31,5 +32,10 @@ class UpdateMeRequest extends FormRequest
         return [
             'name' => 'Имя'
         ];
+    }
+
+    public function toDto(): UpdateMeDTO
+    {
+        return UpdateMeDTO::from($this->validated());
     }
 }

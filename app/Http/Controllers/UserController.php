@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Role\UpdateRequest;
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\UpdateMeRequest;
+use App\Http\Requests\User\UpdateRequest as UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UsersCollection;
 use App\Services\AuthService;
@@ -137,15 +139,15 @@ class UserController extends Controller
      * ),
      * )
      */
-    public function updateMe(UpdateMeRequest $request): JsonResponse
+    public function updateMe(UpdateMeRequest $request): UserResource
     {
-        $user = $request->user();
+        $userId = $request->user()->id;
 
-        $updatedUser = $this->userService->updateUser($user, $request->validated());
+        $dto = $request->toDto();
 
-        return response()->json([
-            new UserResource($updatedUser),
-        ]);
+        $updatedUser = $this->userService->updateUser($userId, $dto);
+
+        return new UserResource($updatedUser);
     }
 
     /**
@@ -463,5 +465,92 @@ class UserController extends Controller
         $newUser = $this->userService->createUser($userDto);
 
         return new UserResource($newUser);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/users/{id}",
+     * tags={"Users"},
+     * summary="Изменение данных пользователя",
+     * description="Изменение данных пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     * @OA\Property(property="name", type="string", example="Джон Доу"),
+     * @OA\Property(property="phone", type="string", example="+89123456789"),
+     * @OA\Property(property="is_blocked", type="string", example="true"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Пользователь успешно изменен",
+     * @OA\JsonContent(
+     * @OA\Property(property="data", type="object",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Джон Доу"),
+     * @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     * @OA\Property(property="phone", type="string", example="+89123456789"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/users/1"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1"),
+     * )
+     * ),
+     * )
+     */
+    public function update(UserUpdateRequest $request, int $id): UserResource
+    {
+        $dtoUser = $request->toDto();
+
+        $updatedUser = $this->userService->updateUser($id, $dtoUser);
+
+        return new UserResource($updatedUser);
     }
 }
