@@ -187,9 +187,9 @@ class UserController extends Controller
      */
     public function deleteMe(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $userId = $request->user()->id;
 
-        $this->userService->deleteUser($user, true);
+        $this->userService->deleteUser($userId, true);
 
         $this->authService->logout();
 
@@ -533,6 +533,17 @@ class UserController extends Controller
      * )
      * ),
      * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
      * response=500,
      * description="Внутрення ошибка сервера",
      * @OA\JsonContent(
@@ -552,5 +563,81 @@ class UserController extends Controller
         $updatedUser = $this->userService->updateUser($id, $dtoUser);
 
         return new UserResource($updatedUser);
+    }
+
+
+
+    /**
+     * @OA\Delete(
+     * path="/users/{id}",
+     * tags={"Users"},
+     * summary="Удаление  пользователя",
+     * description="Удаление  пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно удален",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1"),
+     * )
+     * ),
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $this->userService->deleteUser($id, true);
+
+        return response()->json(null, 204);
     }
 }

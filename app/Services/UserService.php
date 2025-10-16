@@ -4,10 +4,8 @@ namespace App\Services;
 
 use App\DTOs\Contracts\UpdateUserDtoInterface;
 use App\DTOs\CreateUserDTO;
-use App\DTOs\UpdateUserDTO;
 use App\DTOs\UserFilterDTO;
 use App\Exceptions\UserNotFoundException;
-use App\Exceptions\UserUpdateQueryException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -59,8 +57,10 @@ class UserService
         return $user->refresh();
     }
 
-    public function deleteUser(User $user, bool $real = false): void
+    public function deleteUser(int $idUser, bool $real = false): void
     {
+        $user = $this->getUser($idUser);
+
         DB::transaction(function () use ($user, $real): bool {
             return $this->userRepository->delete($user, $real);
         });

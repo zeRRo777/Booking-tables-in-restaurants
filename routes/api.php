@@ -37,6 +37,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/users/{id}', 'show')->can('view', User::class);
             Route::post('/users', 'store')->can('create', User::class);
             Route::patch('/users/{id}', 'update')->can('update', User::class);
+            Route::delete('/users/{id}', 'destroy')->can('delete', User::class);
         });
 
         Route::controller(AuthController::class)->group(function (): void {
