@@ -1271,6 +1271,103 @@
                 ]
             }
         },
+        "/chains/{id}": {
+            "get": {
+                "tags": [
+                    "Chains"
+                ],
+                "summary": "Получение cети ресторана по id",
+                "description": "Получение cети ресторана по id",
+                "operationId": "dfda310acdaa8321e9cca0398efcb898",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID сети ресторана для получения",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение списка пользователей",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Объект сети ресторана",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Тестовая сеть ресторана"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Сеть ресторана не найдена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/chain-not-found"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Chain not Found"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Сеть ресторана не найдена!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/chains/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [

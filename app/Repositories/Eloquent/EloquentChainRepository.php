@@ -46,4 +46,9 @@ class EloquentChainRepository implements ChainRepositoryInterface
             });
         });
     }
+
+    public function findById(int $id): RestaurantChain|null
+    {
+        return RestaurantChain::with('status')->find($id);
+    }
 }

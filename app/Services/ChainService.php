@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\DTOs\Chain\ChainFilterDTO;
+use App\Exceptions\ChainNotFoundException;
+use App\Http\Resources\ChainResourse;
+use App\Models\RestaurantChain;
 use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -25,5 +28,16 @@ class ChainService
         $dto->status = 'active';
 
         return $this->chainRepository->getAllFiltered($dto);
+    }
+
+    public function getChain(int $id): RestaurantChain
+    {
+        $chain = $this->chainRepository->findById($id);
+
+        if (!$chain) {
+            throw new ChainNotFoundException('Сеть ресторанов не найдена!');
+        }
+
+        return $chain;
     }
 }

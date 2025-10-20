@@ -66,5 +66,9 @@ Route::middleware('throttle:api')->group(function (): void {
     });
 
     Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);
-    Route::get('/chains', [ChainController::class, 'index']);
+
+    Route::controller(ChainController::class)->group(function () {
+        Route::get('/chains', 'index');
+        Route::get('/chains/{id}', 'show');
+    });
 });
