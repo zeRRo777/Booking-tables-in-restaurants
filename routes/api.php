@@ -8,8 +8,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
+use App\Models\RestaurantChain;
 use App\Models\Role;
 use App\Models\User;
+use App\Policies\ChainPolicy;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:api')->group(function (): void {
@@ -62,6 +64,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/roles', 'store')->can('create', Role::class);
             Route::patch('/roles/{id}', 'update')->can('update', Role::class);
             Route::delete('/roles/{id}', 'destroy')->can('delete', Role::class);
+        });
+
+        Route::controller(ChainController::class)->group(function () {
+            Route::post('/chains', 'store')->can('create', RestaurantChain::class);
         });
     });
 

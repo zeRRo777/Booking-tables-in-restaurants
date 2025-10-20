@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Chain\IndexRequest;
+use App\Http\Requests\Chain\StoreRequest;
 use App\Http\Resources\ChainCollection;
 use App\Http\Resources\ChainResourse;
 use App\Services\ChainService;
@@ -145,6 +146,83 @@ class ChainController extends Controller
     public function show(int $id): ChainResourse
     {
         $chain = $this->chainService->getChain($id);
+
+        return new ChainResourse($chain);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/chains",
+     * tags={"Chains"},
+     * summary="Добавление новой Сети ресторана",
+     * description="Создает новую сеть и возвращает ее данные",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"name", "status"},
+     * @OA\Property(property="name", type="string", example="New Company"),
+     * @OA\Property(property="status", type="string", example="moderation")
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Сеть ресторана успешно создана",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект сети ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовая сеть ресторана"),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/chains"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутренняя ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/token"),
+     * @OA\Property(property="title", type="string", example="An error occurred while validating token"),
+     * @OA\Property(property="status", type="integer", example=500),
+     * @OA\Property(property="detail", type="string", example="При проверке токена произошла ошибка"),
+     * @OA\Property(property="instance", type="string", example="/api/chains")
+     * )
+     * ),
+     * )
+     */
+    public function store(StoreRequest $request): ChainResourse
+    {
+        $dto = $request->toDto();
+
+        $chain = $this->chainService->createChain($dto);
 
         return new ChainResourse($chain);
     }

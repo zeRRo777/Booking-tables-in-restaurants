@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTOs\Chain\ChainFilterDTO;
+use App\DTOs\Chain\CreateChainDTO;
 use App\Exceptions\ChainNotFoundException;
 use App\Http\Resources\ChainResourse;
 use App\Models\RestaurantChain;
@@ -39,5 +40,10 @@ class ChainService
         }
 
         return $chain;
+    }
+
+    public function createChain(CreateChainDTO $dto): RestaurantChain
+    {
+        return $this->chainRepository->create($dto);
     }
 }

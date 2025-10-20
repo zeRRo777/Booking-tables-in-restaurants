@@ -3,6 +3,8 @@
 namespace App\Repositories\Eloquent;
 
 use App\DTOs\Chain\ChainFilterDTO;
+use App\DTOs\Chain\CreateChainDTO;
+use App\Models\ChainStatuse;
 use App\Models\RestaurantChain;
 use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
@@ -50,5 +52,18 @@ class EloquentChainRepository implements ChainRepositoryInterface
     public function findById(int $id): RestaurantChain|null
     {
         return RestaurantChain::with('status')->find($id);
+    }
+
+    public function create(CreateChainDTO $dto): RestaurantChain
+    {
+
+        $status = ChainStatuse::where('name', $dto->status)->firstOrFail();
+
+        $chain = RestaurantChain::create([
+            'name' => $dto->name,
+            'status_id' => $status->id
+        ]);
+
+        return $chain->load('status');
     }
 }
