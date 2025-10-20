@@ -66,4 +66,9 @@ class EloquentChainRepository implements ChainRepositoryInterface
 
         return $chain->load('status');
     }
+
+    public function update(RestaurantChain $chain, array $data): bool
+    {
+        return $chain->update($data);
+    }
 }

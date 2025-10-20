@@ -68,6 +68,7 @@ Route::middleware('throttle:api')->group(function (): void {
 
         Route::controller(ChainController::class)->group(function () {
             Route::post('/chains', 'store')->can('create', RestaurantChain::class);
+            Route::patch('/chains/{id}', 'update');
         });
     });
 

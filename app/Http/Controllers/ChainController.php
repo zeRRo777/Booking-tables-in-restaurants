@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Chain\IndexRequest;
 use App\Http\Requests\Chain\StoreRequest;
+use App\Http\Requests\Chain\UpdateRequest;
 use App\Http\Resources\ChainCollection;
 use App\Http\Resources\ChainResourse;
 use App\Services\ChainService;
-
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @OA\Tag(
@@ -225,5 +226,103 @@ class ChainController extends Controller
         $chain = $this->chainService->createChain($dto);
 
         return new ChainResourse($chain);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/chains/{id}",
+     * tags={"Chains"},
+     * summary="Изменение данных сети ресторана",
+     * description="Изменение данных сети ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID сети ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="name", type="string", example="Updated Company"),
+     * @OA\Property(property="status", type="string", example="active"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Сеть ресторна успешно изменена",
+     * @OA\JsonContent(
+     * @OA\Property(property="data", type="object",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Updated Company"),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="2023-10-27T10:00:00.000000Z"),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Сеть ресторана не найдена",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/chain-not-found"),
+     * @OA\Property(property="title", type="string", example="Chain not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Сеть ресторана не найдена!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1"),
+     * )
+     * ),
+     * )
+     */
+    public function update(UpdateRequest $request, int $id): ChainResourse
+    {
+        $chain = $this->chainService->getChain($id);
+
+        Gate::authorize('update', $chain);
+
+        $dto = $request->toDto();
+
+        $updatedChain = $this->chainService->updateChain($chain, $dto);
+
+        return new ChainResourse($updatedChain);
     }
 }

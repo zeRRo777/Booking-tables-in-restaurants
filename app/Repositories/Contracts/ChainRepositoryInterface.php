@@ -17,4 +17,6 @@ interface ChainRepositoryInterface
     public function findById(int $id): ?RestaurantChain;
 
     public function create(CreateChainDTO $dto): RestaurantChain;
+
+    public function update(RestaurantChain $chain, array $data): bool;
 }
