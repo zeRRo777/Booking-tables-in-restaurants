@@ -8,6 +8,7 @@ use App\Http\Requests\Chain\UpdateRequest;
 use App\Http\Resources\ChainCollection;
 use App\Http\Resources\ChainResourse;
 use App\Services\ChainService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -324,5 +325,79 @@ class ChainController extends Controller
         $updatedChain = $this->chainService->updateChain($chain, $dto);
 
         return new ChainResourse($updatedChain);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/chains/{id}",
+     * tags={"Chains"},
+     * summary="Удаление сети ресторана",
+     * description="Удаление сети ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID сети ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Сеть ресторана успешно удалена",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Сеть ресторана не найдена",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="Chain not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Сеть ресторана не найдена!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1"),
+     * )
+     * ),
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $this->chainService->deleteChain($id);
+
+        return response()->json(null, 204);
     }
 }

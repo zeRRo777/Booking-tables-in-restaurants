@@ -71,4 +71,9 @@ class EloquentChainRepository implements ChainRepositoryInterface
     {
         return $chain->update($data);
     }
+
+    public function delete(RestaurantChain $chain, bool $real = false): bool
+    {
+        return $real ? $chain->forceDelete() : $chain->delete();
+    }
 }

@@ -24,4 +24,9 @@ class ChainPolicy
 
         return false;
     }
+
+    public function delete(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
 }

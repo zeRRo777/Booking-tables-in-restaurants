@@ -12,6 +12,7 @@ use App\Models\RestaurantChain;
 use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ChainService
 {
@@ -69,5 +70,14 @@ class ChainService
         $this->chainRepository->update($chain, $data);
 
         return $chain->refresh()->load('status');
+    }
+
+    public function deleteChain(int $id, bool $real = false): void
+    {
+        $chain = $this->getChain($id);
+
+        DB::transaction(function () use ($chain, $real): bool {
+            return $this->chainRepository->delete($chain, $real);
+        });
     }
 }

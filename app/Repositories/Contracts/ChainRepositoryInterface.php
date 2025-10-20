@@ -19,4 +19,6 @@ interface ChainRepositoryInterface
     public function create(CreateChainDTO $dto): RestaurantChain;
 
     public function update(RestaurantChain $chain, array $data): bool;
+
+    public function delete(RestaurantChain $chain, bool $real = false): bool;
 }
