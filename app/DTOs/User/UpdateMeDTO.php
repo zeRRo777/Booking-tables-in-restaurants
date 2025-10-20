@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs;
+namespace App\DTOs\User;
 
 use App\DTOs\Contracts\UpdateUserDtoInterface;
 use Spatie\LaravelData\Data;

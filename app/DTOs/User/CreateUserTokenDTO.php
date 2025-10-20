@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTOs;
+namespace App\DTOs\User;
 
 use Carbon\Carbon;
 use Spatie\LaravelData\Data;

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class UsersCollection extends ResourceCollection
+class UserCollection extends ResourceCollection
 {
     public $collects = UserResource::class;
     /**
@@ -28,7 +28,7 @@ class UsersCollection extends ResourceCollection
      * @param  array  $default
      * @return array
      */
-    public function paginationInformation($request, $paginated, $default)
+    public function paginationInformation($request, $paginated, $default): array
     {
         unset($default['links']);
         $default['meta'] = [

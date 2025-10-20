@@ -2,9 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
-use App\DTOs\CreateUserDTO;
-use App\DTOs\CreateUserTokenDTO;
-use App\DTOs\UserFilterDTO;
+use App\DTOs\User\CreateUserDTO;
+use App\DTOs\User\CreateUserTokenDTO;
+use App\DTOs\User\UserFilterDTO;
 use App\Models\User;
 use App\Models\UserToken;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

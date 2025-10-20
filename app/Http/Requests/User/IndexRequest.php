@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\User;
 
-use App\DTOs\UserFilterDTO;
+use App\DTOs\User\UserFilterDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexRequest extends FormRequest
@@ -27,7 +27,7 @@ class IndexRequest extends FormRequest
             'email' => ['sometimes', 'string', 'max:50'],
             'phone' => ['sometimes', 'string', 'max:20'],
             'is_blocked' => ['sometimes', 'in:true,false'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100']
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ];
     }
 

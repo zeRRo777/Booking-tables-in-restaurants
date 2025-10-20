@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChainController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
@@ -65,4 +66,5 @@ Route::middleware('throttle:api')->group(function (): void {
     });
 
     Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);
+    Route::get('/chains', [ChainController::class, 'index']);
 });

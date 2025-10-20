@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\DTOs\CreateUserDTO;
+use App\DTOs\User\CreateUserDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterUserRequest extends FormRequest

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\RegisterUserRequest;
-use App\Http\Requests\Role\UpdateRequest;
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Requests\User\UpdateRequest as UserUpdateRequest;
+use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UsersCollection;
 use App\Services\AuthService;
@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
  * name="ME",
  * description="API для получение информации о пользователе"
  * )
- * * @OA\Tag(
+ * @OA\Tag(
  * name="Users",
  * description="API для управления другими пользователями (административные функции)"
  * )
@@ -302,13 +302,13 @@ class UserController extends Controller
      * ),
      * )
      */
-    public function index(IndexRequest $request): UsersCollection
+    public function index(IndexRequest $request): UserCollection
     {
         $filterDto = $request->toDto();
 
         $users = $this->userService->getUsers($filterDto);
 
-        return new UsersCollection($users);
+        return new UserCollection($users);
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\DTOs\CreateUserDTO;
-use App\DTOs\CreateUserTokenDTO;
+use App\DTOs\User\CreateUserDTO;
+use App\DTOs\User\CreateUserTokenDTO;
 use App\Exceptions\AuthenticateException;
 use App\Exceptions\MissingEmailChangeException;
 use App\Exceptions\MissingPasswordResetTokenException;
@@ -13,7 +13,6 @@ use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserToken;
 use App\Notifications\EmailChangeNewEmailNotification;
-use App\Notifications\EmailChangeOldEmailNotification;
 use App\Notifications\PasswordResetNofication;
 use App\Notifications\SuccessChangeEmailNotification;
 use App\Notifications\SuccessChangePasswordNotification;

@@ -1146,6 +1146,131 @@
                 }
             }
         },
+        "/chains": {
+            "get": {
+                "tags": [
+                    "Chains"
+                ],
+                "summary": "Получение списка сетей ресторанов",
+                "description": "Получение списка сетей ресторанов",
+                "operationId": "b3a461c4e25d145bb2fef9beb64b62ba",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Поиск по названию",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Поиск по cтатусу сети ресторана",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "active",
+                            "enum": [
+                                "active",
+                                "moderation",
+                                "rejected",
+                                "closed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Номер страницы",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Количество элементов на странице",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение списка сетей ресторанов",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Массив сетей ресторанов",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Тестовая сеть"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "13.10.2025 16:58:09"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "13.10.2025 16:58:09"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Пагинация",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 56
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "count_pages": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [
@@ -4013,6 +4138,10 @@
         {
             "name": "Auth",
             "description": "API для аутентификации и регистрации"
+        },
+        {
+            "name": "Chains",
+            "description": "API для получение информации о сети ресторанов"
         },
         {
             "name": "Roles",

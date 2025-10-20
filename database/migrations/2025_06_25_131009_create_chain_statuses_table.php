@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('restaurant_chains', function (Blueprint $table) {
+        Schema::create('chain_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50)->unique();
-            $table->foreignId('status_id')
-                ->nullable()
-                ->constrained('chain_statuses', 'id')
-                ->nullOnDelete();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('restaurant_chains');
+        Schema::dropIfExists('chain_statuses');
     }
 };

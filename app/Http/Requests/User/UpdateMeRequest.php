@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\User;
 
-use App\DTOs\UpdateMeDTO;
+use App\DTOs\User\UpdateMeDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMeRequest extends FormRequest

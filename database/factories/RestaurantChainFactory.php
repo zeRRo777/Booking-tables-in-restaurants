@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\ChainStatuse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class RestaurantChainFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->company() . ' Group',
+            'status_id' => ChainStatuse::query()->where('name', 'moderation')->firstOrCreate(['name' => 'moderation'])->id,
         ];
     }
 }

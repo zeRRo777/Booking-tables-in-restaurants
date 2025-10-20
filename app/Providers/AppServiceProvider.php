@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
+use App\Repositories\Contracts\ChainRepositoryInterface;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
 use App\Repositories\Contracts\EmailVefiedRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
@@ -14,6 +15,7 @@ use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\UserTokensRepositoryInterface;
+use App\Repositories\Eloquent\EloquentChainRepository;
 use App\Repositories\Eloquent\EloquentEmailChangeRepository;
 use App\Repositories\Eloquent\EloquentEmailVerifiedRepository;
 use App\Repositories\Eloquent\EloquentPasswordResetRepository;
@@ -44,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EmailVefiedRepositoryInterface::class, EloquentEmailVerifiedRepository::class);
         $this->app->bind(PhoneVefiedRepositoryInterface::class, EloquentPhoneVerifiedRepository::class);
         $this->app->bind(RoleRepositoryInterface::class, EloquentRoleRepository::class);
+        $this->app->bind(ChainRepositoryInterface::class, EloquentChainRepository::class);
     }
 
     /**

@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\DTOs\Contracts\UpdateUserDtoInterface;
-use App\DTOs\CreateUserDTO;
-use App\DTOs\UserFilterDTO;
+use App\DTOs\User\CreateUserDTO;
+use App\DTOs\User\UserFilterDTO;
 use App\Exceptions\UserNotFoundException;
 use App\Models\Role;
 use App\Models\User;
