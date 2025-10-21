@@ -77,6 +77,8 @@ class EloquentUserRepository implements UserRepositoryInterface
             $q->where('is_blocked', $dto->is_blocked);
         });
 
+        $query->orderBy($dto->sort_by, $dto->sort_direction);
+
         return $query->paginate($dto->per_page);
     }
 }

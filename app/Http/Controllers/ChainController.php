@@ -50,6 +50,28 @@ class ChainController extends Controller
      * )
      * ),
      * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"id", "name", "created_at"},
+     * default="id"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
      * name="page",
      * in="query",
      * description="Номер страницы",

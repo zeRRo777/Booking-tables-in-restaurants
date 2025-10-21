@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\DTOs\User\UserFilterDTO;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexRequest extends FormRequest
 {
@@ -28,6 +29,8 @@ class IndexRequest extends FormRequest
             'phone' => ['sometimes', 'string', 'max:20'],
             'is_blocked' => ['sometimes', 'in:true,false'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name', 'email', 'phone', 'created_at', 'is_blocked'])],
+            'sort_direction' => ['sometimes', 'string', Rule::in(['asc', 'desc'])],
         ];
     }
 

@@ -28,7 +28,7 @@ class IndexRequest extends FormRequest
         $rules = [
             'name' => ['sometimes', 'string', 'max:50'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name'])],
+            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name', 'created_at'])],
             'sort_direction' => ['sometimes', 'string', Rule::in(['asc', 'desc'])]
         ];
 
