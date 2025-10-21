@@ -6,7 +6,6 @@ use App\DTOs\Chain\ChainFilterDTO;
 use App\DTOs\Chain\CreateChainDTO;
 use App\DTOs\Chain\UpdateChainDTO;
 use App\Exceptions\ChainNotFoundException;
-use App\Http\Resources\ChainResourse;
 use App\Models\ChainStatuse;
 use App\Models\RestaurantChain;
 use App\Models\User;

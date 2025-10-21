@@ -39,7 +39,7 @@ class EloquentChainRepository implements ChainRepositoryInterface
         $query->with('status');
 
         $query->when($dto->name, function ($q) use ($dto) {
-            $q->where('name', 'like', '%' . $dto->name . '%');
+            $q->whereLike('name', '%' . $dto->name . '%');
         });
 
         $query->when($dto->status, function ($q) use ($dto) {
@@ -47,6 +47,8 @@ class EloquentChainRepository implements ChainRepositoryInterface
                 $statusQuery->where('name', $dto->status);
             });
         });
+
+        $query->orderBy($dto->sort_by, $dto->sort_direction);
     }
 
     public function findById(int $id): RestaurantChain|null

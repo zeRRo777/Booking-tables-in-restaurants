@@ -10,5 +10,7 @@ class ChainFilterDTO extends Data
         public ?string $name = null,
         public int $per_page = 10,
         public ?string $status = null,
+        public string $sort_by = 'id',
+        public string $sort_direction = 'asc',
     ) {}
 }

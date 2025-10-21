@@ -4,6 +4,7 @@ namespace App\Http\Requests\Chain;
 
 use App\DTOs\Chain\ChainFilterDTO;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexRequest extends FormRequest
 {
@@ -27,6 +28,8 @@ class IndexRequest extends FormRequest
         $rules = [
             'name' => ['sometimes', 'string', 'max:50'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name'])],
+            'sort_direction' => ['sometimes', 'string', Rule::in(['asc', 'desc'])]
         ];
 
         if ($user && ($user->hasRole('superadmin') || $user->hasRole('admin_chain'))) {
@@ -42,6 +45,8 @@ class IndexRequest extends FormRequest
             'name' => 'Название сети',
             'per_page' => 'Количество пользователей на странице',
             'status' => 'Статус сети',
+            'sort_by' => 'Поле сортировки',
+            'sort_direction' => 'Направление сортировки'
         ];
     }
 
