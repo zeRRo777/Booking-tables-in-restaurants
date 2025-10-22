@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainController;
+use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
@@ -11,7 +12,6 @@ use App\Http\Middleware\ValidateTokenInDatabase;
 use App\Models\RestaurantChain;
 use App\Models\Role;
 use App\Models\User;
-use App\Policies\ChainPolicy;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:api')->group(function (): void {
@@ -78,5 +78,9 @@ Route::middleware('throttle:api')->group(function (): void {
     Route::controller(ChainController::class)->group(function () {
         Route::get('/chains', 'index');
         Route::get('/chains/{id}', 'show');
+    });
+
+    Route::controller(RestaurantController::class)->group(function () {
+        Route::get('/restaurants', 'index');
     });
 });

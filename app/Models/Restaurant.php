@@ -62,7 +62,7 @@ class Restaurant extends Model
 
     public function chain(): BelongsTo
     {
-        return $this->belongsTo(RestaurantChain::class);
+        return $this->belongsTo(RestaurantChain::class, 'restaurant_chain_id');
     }
 
     public function reviews(): HasMany
