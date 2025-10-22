@@ -5,7 +5,7 @@ namespace App\Services;
 use App\DTOs\Contracts\UpdateUserDtoInterface;
 use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UserFilterDTO;
-use App\Exceptions\UserNotFoundException;
+use App\Exceptions\NotFoundException;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -76,7 +76,7 @@ class UserService
         $user = $this->userRepository->findById($id);
 
         if (!$user) {
-            throw new UserNotFoundException('Пользователь не найден!');
+            throw new NotFoundException('Пользователь не найден!');
         }
 
         return $user;

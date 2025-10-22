@@ -8,8 +8,8 @@ use App\Exceptions\AuthenticateException;
 use App\Exceptions\MissingEmailChangeException;
 use App\Exceptions\MissingPasswordResetTokenException;
 use App\Exceptions\MissingPhoneChangeCodeException;
+use App\Exceptions\NotFoundException;
 use App\Exceptions\TokenExpiredException;
-use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserToken;
 use App\Notifications\EmailChangeNewEmailNotification;
@@ -125,7 +125,7 @@ class AuthService
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
-            throw new UserNotFoundException('Пользователь не найден!');
+            throw new NotFoundException('Пользователь не найден!');
         }
 
         DB::transaction(function () use ($user, $password, $email) {
@@ -155,7 +155,7 @@ class AuthService
         $user = $this->userRepository->findById($tokenObject->user_id);
 
         if (!$user) {
-            throw new UserNotFoundException('Пользователь не найден!');
+            throw new NotFoundException('Пользователь не найден!');
         }
 
         $expiresInMinutes = config('auth.email_change_expiration', 60);

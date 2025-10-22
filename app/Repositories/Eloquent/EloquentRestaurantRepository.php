@@ -73,4 +73,9 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
             $q->whereHas('status', fn(Builder $sq) => $sq->where('name', 'active'));
         });
     }
+
+    public function getById(int $id): Restaurant|null
+    {
+        return Restaurant::with(['status', 'chain'])->find($id);
+    }
 }

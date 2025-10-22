@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\RoleNotFoundException;
+use App\Exceptions\NotFoundException;
 use App\Models\Role;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
@@ -42,7 +42,7 @@ class RoleService
         $role = $this->roleRepository->findById($id);
 
         if (!$role) {
-            throw new RoleNotFoundException("Роль с ID {$id} не найдена.");
+            throw new NotFoundException("Роль с ID {$id} не найдена.");
         }
 
         return $role;

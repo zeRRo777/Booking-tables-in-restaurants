@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Requests\Chain\IndexRequest;
 use App\Http\Requests\Chain\StoreRequest;
 use App\Http\Requests\Chain\UpdateRequest;
@@ -170,6 +171,10 @@ class ChainController extends Controller
     public function show(int $id): ChainResourse
     {
         $chain = $this->chainService->getChain($id);
+
+        if (Gate::denies('view', $chain)) {
+            throw new NotFoundException('Сеть ресторанов не найдена!');
+        }
 
         return new ChainResourse($chain);
     }

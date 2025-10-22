@@ -5,13 +5,13 @@ namespace App\Services;
 use App\DTOs\Chain\ChainFilterDTO;
 use App\DTOs\Chain\CreateChainDTO;
 use App\DTOs\Chain\UpdateChainDTO;
-use App\Exceptions\ChainNotFoundException;
 use App\Models\ChainStatuse;
 use App\Models\RestaurantChain;
 use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ChainService
 {
@@ -38,7 +38,7 @@ class ChainService
         $chain = $this->chainRepository->findById($id);
 
         if (!$chain) {
-            throw new ChainNotFoundException('Сеть ресторанов не найдена!');
+            throw new NotFoundHttpException('Сеть ресторанов не найдена!');
         }
 
         return $chain;

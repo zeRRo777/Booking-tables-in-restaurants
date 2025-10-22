@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
 use App\Models\User;
 use App\Policies\ChainPolicy;
+use App\Policies\RestaurantPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
 use App\Repositories\Contracts\ChainRepositoryInterface;
@@ -82,5 +84,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(RestaurantChain::class, ChainPolicy::class);
+        Gate::policy(Restaurant::class, RestaurantPolicy::class);
     }
 }

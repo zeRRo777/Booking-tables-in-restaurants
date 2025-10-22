@@ -6,9 +6,9 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
-class RoleNotFoundException extends Exception
+class NotFoundException extends Exception
 {
-    public function __construct(string $message = "Role not found.", int $code = Response::HTTP_NOT_FOUND)
+    public function __construct(string $message = "Object not found.", int $code = Response::HTTP_NOT_FOUND)
     {
         parent::__construct($message, $code);
     }
@@ -16,8 +16,8 @@ class RoleNotFoundException extends Exception
     public function render(): JsonResponse
     {
         return response()->json([
-            'type' => config('app.url') . '/errors/role-not-found',
-            'title' => 'Role not found',
+            'type' => config('app.url') . '/errors/not-found',
+            'title' => 'Object not found',
             'status' => $this->code,
             'detail' => $this->message,
         ], $this->code);

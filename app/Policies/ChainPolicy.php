@@ -29,4 +29,23 @@ class ChainPolicy
     {
         return $user->hasRole('superadmin');
     }
+
+    public function view(?User $user, RestaurantChain $chain): bool
+    {
+        if ($chain->status->name === 'active') {
+            return true;
+        }
+
+        if ($user) {
+            if ($user->hasRole('superadmin')) {
+                return true;
+            }
+
+            if ($user->hasRole('admin_chain')) {
+                return $chain->superAdmins()->where('user_id', $user->id)->exists();
+            }
+        }
+
+        return false;
+    }
 }

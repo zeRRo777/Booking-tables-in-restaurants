@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Resources\RestaurantCollection;
+use App\Http\Resources\RestaurantResource;
 use App\Services\RestaurantService;
-
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @OA\Tag(
@@ -172,5 +174,96 @@ class RestaurantController extends Controller
         $restaurants = $this->restaurantService->getRestaurants($dto, $user);
 
         return new RestaurantCollection($restaurants);
+    }
+
+
+    /**
+     * @OA\GET(
+     * path="/restaurants/{id}",
+     * tags={"Restaurants"},
+     * summary="Получение ресторана по id",
+     * description="Получение ресторана по id",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана для получения",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение ресторана",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="description", type="string", example="Тестовый описание"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * @OA\Property(property="type_kitchen", type="string", example="Тестовый тип кухни"),
+     * @OA\Property(property="price_range", type="string", example="1000-2000"),
+     * @OA\Property(
+     * property="working_hours",
+     * type="object",
+     * description="Рабочие часы",
+     * @OA\Property(
+     * property="weekdays",
+     * type="object",
+     * description="Рабочие часы в будние дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="21.00"),
+     * ),
+     * @OA\Property(
+     * property="weekend",
+     * type="object",
+     * description="Рабочие часы в выходные дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="23.00"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="chain",
+     * type="object",
+     * description="Сеть ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовая сеть"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="cancellation_policy", type="string", example="cancellation_policy"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Ресторан не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Object Not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Ресторан не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * )
+     */
+    public function show(int $id): RestaurantResource
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        if (Gate::denies('view', $restaurant)) {
+            throw new NotFoundException('Ресторан не найден!');
+        }
+
+        return new RestaurantResource($restaurant);
     }
 }
