@@ -49,14 +49,6 @@ class IndexRequest extends FormRequest
 
     public function toDto(): RestaurantFilterDTO
     {
-        $validatedData = $this->validated();
-
-        $user = $this->user();
-
-        if (!$user || !$user->hasAnyRole(['superadmin', 'admin_chain', 'admin_restaurant'])) {
-            $validatedData['status'] = 'active';
-        }
-
-        return RestaurantFilterDTO::from($validatedData);
+        return RestaurantFilterDTO::from($this->validated());
     }
 }

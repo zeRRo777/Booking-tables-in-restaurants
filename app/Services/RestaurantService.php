@@ -17,7 +17,12 @@ class RestaurantService
 
     public function getRestaurants(RestaurantFilterDTO $dto, ?User $user): LengthAwarePaginator
     {
-        return $this->restaurantRepository->getFiltered($dto, $user);
+        $query = Restaurant::query()
+            ->with(['status', 'chain']);
+
+        $query->forUser($user);
+
+        return $this->restaurantRepository->applyFiltersAndPaginate($query, $dto);
     }
 
     public function getRestaurant(int $id): Restaurant

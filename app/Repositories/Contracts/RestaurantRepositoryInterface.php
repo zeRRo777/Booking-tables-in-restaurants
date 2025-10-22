@@ -4,12 +4,12 @@ namespace App\Repositories\Contracts;
 
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\Models\Restaurant;
-use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 interface RestaurantRepositoryInterface
 {
-    public function getFiltered(RestaurantFilterDTO $dto, ?User $user): LengthAwarePaginator;
+    public function applyFiltersAndPaginate(Builder $query, RestaurantFilterDTO $dto): LengthAwarePaginator;
 
     public function getById(int $id): ?Restaurant;
 }
