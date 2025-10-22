@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -80,9 +81,20 @@ return Application::configure(basePath: dirname(__DIR__))
                     'type' => config('app.url') . '/errors/database-error',
                     'title' => 'Database Error',
                     'status' => 500,
-                    'detail' => 'Произошла ошибка базы данных!',
+                    'detail' => $e->getMessage(),
                     'instance' => $request->getUri(),
                 ], 500);
+            }
+        });
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'type' => config('app.url') . '/errors/not-found',
+                    'title' => 'Object Not Found',
+                    'status' => 404,
+                    'detail' => $e->getMessage(),
+                    'instance' => $request->getUri(),
+                ], 404);
             }
         });
     })->create();

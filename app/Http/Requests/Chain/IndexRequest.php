@@ -52,14 +52,6 @@ class IndexRequest extends FormRequest
 
     public function toDto(): ChainFilterDTO
     {
-        $validatedData = $this->validated();
-
-        $user = $this->user();
-
-        if (!$user || !($user->hasRole('superadmin') || $user->hasRole('admin_chain'))) {
-            $validatedData['status'] = 'active';
-        }
-
-        return ChainFilterDTO::from($validatedData);
+        return ChainFilterDTO::from($this->validated());
     }
 }

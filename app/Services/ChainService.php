@@ -20,17 +20,9 @@ class ChainService
     ) {}
     public function getChains(ChainFilterDTO $dto, ?User $user): LengthAwarePaginator
     {
-        if ($user && $user->hasRole('superadmin')) {
-            return $this->chainRepository->getAllFiltered($dto);
-        }
+        $query = RestaurantChain::with('status')->forUser($user);
 
-        if ($user && $user->hasRole('admin_chain')) {
-            return $this->chainRepository->getForChainAdminFiltered($dto, $user);
-        }
-
-        $dto->status = 'active';
-
-        return $this->chainRepository->getAllFiltered($dto);
+        return $this->chainRepository->applyFiltersAndPaginate($query, $dto);
     }
 
     public function getChain(int $id): RestaurantChain
