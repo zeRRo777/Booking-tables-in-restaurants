@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
+use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Requests\Restaurant\UpdateRequest;
@@ -598,5 +599,135 @@ class RestaurantController extends Controller
         $this->restaurantService->deleteRestaurant($restaurant, true);
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/restaurants/{id}/status",
+     * tags={"Restaurants"},
+     * summary="Изменение статуса ресторана",
+     * description="Изменение статуса ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"status"},
+     * @OA\Property(property="status", type="string", example="active"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Ресторан успешно изменен",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="description", type="string", example="Тестовый описание"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * @OA\Property(property="type_kitchen", type="string", example="Тестовый тип кухни"),
+     * @OA\Property(property="price_range", type="string", example="1000-2000"),
+     * @OA\Property(
+     * property="working_hours",
+     * type="object",
+     * description="Рабочие часы",
+     * @OA\Property(
+     * property="weekdays",
+     * type="object",
+     * description="Рабочие часы в будние дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="21.00"),
+     * ),
+     * @OA\Property(
+     * property="weekend",
+     * type="object",
+     * description="Рабочие часы в выходные дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="23.00"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="chain",
+     * type="object",
+     * description="Сеть ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовая сеть"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="cancellation_policy", type="string", example="cancellation_policy"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/status"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/status")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Ресторан не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Chain not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Ресторан не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/status")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/status"),
+     * )
+     * ),
+     * )
+     */
+    public function changeStatus(ChangeStatusRequest $request, int $id): RestaurantResource
+    {
+        $dto = $request->toDto();
+
+        $upadatedRestaurant = $this->restaurantService->changeStatus($id, $dto);
+
+        return new RestaurantResource($upadatedRestaurant);
     }
 }

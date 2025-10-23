@@ -77,6 +77,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/restaurants', 'store')->can('create', Restaurant::class);
             Route::patch('/restaurants/{id}', 'update');
             Route::delete('/restaurants/{id}', 'destroy');
+            Route::patch('/restaurants/{id}/status', 'changeStatus')->can('changeStatus', Restaurant::class);
         });
     });
 

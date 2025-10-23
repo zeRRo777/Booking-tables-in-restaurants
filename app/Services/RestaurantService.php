@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
+use App\Models\RestaurantStatuse;
 use App\Models\User;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -74,5 +76,24 @@ class RestaurantService
         DB::transaction(function () use ($restaurant, $real): void {
             $this->restaurantRepository->delete($restaurant, $real);
         });
+    }
+
+    public function changeStatus(int $id, ChangeStatusDTO $dto): Restaurant
+    {
+        $resataurant = $this->getRestaurant($id);
+
+        if ($resataurant->status->name === $dto->status) {
+            return $resataurant;
+        }
+
+        $status = RestaurantStatuse::where('name', $dto->status)->firstOrFail();
+
+        $data = [
+            'status_id' => $status->id,
+        ];
+
+        $this->restaurantRepository->update($resataurant, $data);
+
+        return $resataurant->refresh()->load(['status', 'chain']);
     }
 }

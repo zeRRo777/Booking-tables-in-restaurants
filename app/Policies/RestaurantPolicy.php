@@ -68,4 +68,9 @@ class RestaurantPolicy
 
         return false;
     }
+
+    public function changeStatus(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
 }
