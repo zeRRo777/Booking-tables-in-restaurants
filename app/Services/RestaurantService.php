@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
@@ -34,5 +35,10 @@ class RestaurantService
         }
 
         return $restaurant;
+    }
+
+    public function createRestaurant(CreateRestaurantDTO $dto): Restaurant
+    {
+        return $this->restaurantRepository->create($dto);
     }
 }

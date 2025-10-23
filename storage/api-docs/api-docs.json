@@ -2231,6 +2231,275 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Добавление нового ресторана",
+                "description": "Создает новый ресторан и возвращает его данные",
+                "operationId": "5c363de6f03308e2e025c1df5242509d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "New Restaurant"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "New Address"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "New description"
+                                    },
+                                    "type_kitchen": {
+                                        "type": "string",
+                                        "example": "New type_kitchen"
+                                    },
+                                    "price_range": {
+                                        "type": "string",
+                                        "example": "New price_range"
+                                    },
+                                    "weekdays_opens_at": {
+                                        "type": "string",
+                                        "example": "09:00"
+                                    },
+                                    "weekdays_closes_at": {
+                                        "type": "string",
+                                        "example": "22:00"
+                                    },
+                                    "weekend_opens_at": {
+                                        "type": "string",
+                                        "example": "11:00"
+                                    },
+                                    "weekend_closes_at": {
+                                        "type": "string",
+                                        "example": "23:00"
+                                    },
+                                    "cancellation_policy": {
+                                        "type": "string",
+                                        "example": "cancellation_policy"
+                                    },
+                                    "restaurant_chain_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ресторан успешно создан",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Объект ресторана",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Тестовый ресторан"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Тестовый описание"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Тестовый адрес"
+                                                },
+                                                "type_kitchen": {
+                                                    "type": "string",
+                                                    "example": "Тестовый тип кухни"
+                                                },
+                                                "price_range": {
+                                                    "type": "string",
+                                                    "example": "1000-2000"
+                                                },
+                                                "working_hours": {
+                                                    "description": "Рабочие часы",
+                                                    "properties": {
+                                                        "weekdays": {
+                                                            "description": "Рабочие часы в будние дни",
+                                                            "properties": {
+                                                                "opens_at": {
+                                                                    "type": "string",
+                                                                    "example": "09.00"
+                                                                },
+                                                                "closes_at": {
+                                                                    "type": "string",
+                                                                    "example": "21.00"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "weekend": {
+                                                            "description": "Рабочие часы в выходные дни",
+                                                            "properties": {
+                                                                "opens_at": {
+                                                                    "type": "string",
+                                                                    "example": "09.00"
+                                                                },
+                                                                "closes_at": {
+                                                                    "type": "string",
+                                                                    "example": "23.00"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "chain": {
+                                                    "description": "Сеть ресторана",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Тестовая сеть"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "13.10.2025 16:58:09"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "13.10.2025 16:58:09"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "cancellation_policy": {
+                                                    "type": "string",
+                                                    "example": "cancellation_policy"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла одна или несколько ошибок проверки."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/restaurants"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Поле email обязательно для заполнения."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/restaurants"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/restaurants/{id}": {

@@ -29,4 +29,13 @@ class RestaurantPolicy
 
         return false;
     }
+
+    public function create(User $user): bool
+    {
+        if ($user->hasAnyRole(['superadmin', 'admin_chain'])) {
+            return true;
+        }
+
+        return false;
+    }
 }

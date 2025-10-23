@@ -423,7 +423,7 @@ class ChainController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $this->chainService->deleteChain($id);
+        $this->chainService->deleteChain($id, true);
 
         return response()->json(null, 204);
     }

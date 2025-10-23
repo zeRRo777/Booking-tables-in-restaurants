@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\IndexRequest;
+use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Services\RestaurantService;
@@ -263,6 +264,114 @@ class RestaurantController extends Controller
         if (Gate::denies('view', $restaurant)) {
             throw new NotFoundException('Ресторан не найден!');
         }
+
+        return new RestaurantResource($restaurant);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/restaurants",
+     * tags={"Restaurants"},
+     * summary="Добавление нового ресторана",
+     * description="Создает новый ресторан и возвращает его данные",
+     * security={{"bearerAuth":{}}},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"name", "address"},
+     * @OA\Property(property="name", type="string", example="New Restaurant"),
+     * @OA\Property(property="address", type="string", example="New Address"),
+     * @OA\Property(property="description", type="string", example="New description"),
+     * @OA\Property(property="type_kitchen", type="string", example="New type_kitchen"),
+     * @OA\Property(property="price_range", type="string", example="New price_range"),
+     * @OA\Property(property="weekdays_opens_at", type="string", example="09:00"),
+     * @OA\Property(property="weekdays_closes_at", type="string", example="22:00"),
+     * @OA\Property(property="weekend_opens_at", type="string", example="11:00"),
+     * @OA\Property(property="weekend_closes_at", type="string", example="23:00"),
+     * @OA\Property(property="cancellation_policy", type="string", example="cancellation_policy"),
+     * @OA\Property(property="restaurant_chain_id", type="string", example="1"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Ресторан успешно создан",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="description", type="string", example="Тестовый описание"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * @OA\Property(property="type_kitchen", type="string", example="Тестовый тип кухни"),
+     * @OA\Property(property="price_range", type="string", example="1000-2000"),
+     * @OA\Property(
+     * property="working_hours",
+     * type="object",
+     * description="Рабочие часы",
+     * @OA\Property(
+     * property="weekdays",
+     * type="object",
+     * description="Рабочие часы в будние дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="21.00"),
+     * ),
+     * @OA\Property(
+     * property="weekend",
+     * type="object",
+     * description="Рабочие часы в выходные дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="23.00"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="chain",
+     * type="object",
+     * description="Сеть ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовая сеть"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="cancellation_policy", type="string", example="cancellation_policy"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants")
+     * )
+     * ),
+     * )
+     */
+    public function store(StoreRequest $request): RestaurantResource
+    {
+        $dto = $request->toDto();
+
+        $restaurant = $this->restaurantService->createRestaurant($dto);
 
         return new RestaurantResource($restaurant);
     }

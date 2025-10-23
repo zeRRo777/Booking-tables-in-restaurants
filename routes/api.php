@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
+use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
 use App\Models\User;
@@ -70,6 +71,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/chains', 'store')->can('create', RestaurantChain::class);
             Route::patch('/chains/{id}', 'update');
             Route::delete('/chains/{id}', 'destroy')->can('delete', RestaurantChain::class);
+        });
+
+        Route::controller(RestaurantController::class)->group(function () {
+            Route::post('/restaurants', 'store')->can('create', Restaurant::class);
         });
     });
 
