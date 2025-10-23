@@ -15,4 +15,8 @@ interface RestaurantRepositoryInterface
     public function getById(int $id): ?Restaurant;
 
     public function create(CreateRestaurantDTO $dto): Restaurant;
+
+    public function update(Restaurant $restaurant, array $data): bool;
+
+    public function delete(Restaurant $restaurant, bool $real = false): bool;
 }

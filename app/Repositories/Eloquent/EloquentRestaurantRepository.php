@@ -70,6 +70,16 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
             ]
         );
 
-        return $restaurant->fresh(['status', 'chain']);
+        return $restaurant->load(['status', 'chain']);
+    }
+
+    public function update(Restaurant $restaurant, array $data): bool
+    {
+        return $restaurant->update($data);
+    }
+
+    public function delete(Restaurant $restaurant, bool $real = false): bool
+    {
+        return $real ? $restaurant->forceDelete() : $restaurant->delete();
     }
 }

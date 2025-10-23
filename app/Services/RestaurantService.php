@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
+use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class RestaurantService
 {
@@ -40,5 +42,37 @@ class RestaurantService
     public function createRestaurant(CreateRestaurantDTO $dto): Restaurant
     {
         return $this->restaurantRepository->create($dto);
+    }
+
+    public function updateRestaurant(Restaurant $restaurant, UpdateRestaurantDTO $dto): Restaurant
+    {
+        $oldChainId = $restaurant->restaurant_chain_id;
+
+        $data = array_filter(
+            $dto->toArray(),
+            fn($value) => !is_null($value)
+        );
+
+        if (empty($data)) {
+            return $restaurant;
+        }
+
+        $isChainChanging = array_key_exists('restaurant_chain_id', $data) && $data['restaurant_chain_id'] !== $oldChainId;
+
+        DB::transaction(function () use ($restaurant, $data, $isChainChanging): void {
+            if ($isChainChanging) {
+                $restaurant->administrators()->sync([]);
+            }
+            $this->restaurantRepository->update($restaurant, $data);
+        });
+
+        return $restaurant->refresh()->load(['status', 'chain']);
+    }
+
+    public function deleteRestaurant(Restaurant $restaurant, bool $real = false): void
+    {
+        DB::transaction(function () use ($restaurant, $real): void {
+            $this->restaurantRepository->delete($restaurant, $real);
+        });
     }
 }

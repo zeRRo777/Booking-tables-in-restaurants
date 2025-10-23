@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
+use App\Http\Requests\Restaurant\UpdateRequest;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Services\RestaurantService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -374,5 +377,226 @@ class RestaurantController extends Controller
         $restaurant = $this->restaurantService->createRestaurant($dto);
 
         return new RestaurantResource($restaurant);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/restaurants/{id}",
+     * tags={"Restaurants"},
+     * summary="Изменение данных ресторана",
+     * description="Изменение данных ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"name", "address"},
+     * @OA\Property(property="name", type="string", example="Updated Restaurant"),
+     * @OA\Property(property="address", type="string", example="Updated Address"),
+     * @OA\Property(property="description", type="string", example="Updated description"),
+     * @OA\Property(property="type_kitchen", type="string", example="Updated type_kitchen"),
+     * @OA\Property(property="price_range", type="string", example="Updated price_range"),
+     * @OA\Property(property="weekdays_opens_at", type="string", example="09:00"),
+     * @OA\Property(property="weekdays_closes_at", type="string", example="22:00"),
+     * @OA\Property(property="weekend_opens_at", type="string", example="11:00"),
+     * @OA\Property(property="weekend_closes_at", type="string", example="23:00"),
+     * @OA\Property(property="cancellation_policy", type="string", example="updated cancellation_policy"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Ресторан успешно изменен",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="description", type="string", example="Тестовый описание"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * @OA\Property(property="type_kitchen", type="string", example="Тестовый тип кухни"),
+     * @OA\Property(property="price_range", type="string", example="1000-2000"),
+     * @OA\Property(
+     * property="working_hours",
+     * type="object",
+     * description="Рабочие часы",
+     * @OA\Property(
+     * property="weekdays",
+     * type="object",
+     * description="Рабочие часы в будние дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="21.00"),
+     * ),
+     * @OA\Property(
+     * property="weekend",
+     * type="object",
+     * description="Рабочие часы в выходные дни",
+     * @OA\Property(property="opens_at", type="string", example="09.00"),
+     * @OA\Property(property="closes_at", type="string", example="23.00"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="chain",
+     * type="object",
+     * description="Сеть ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовая сеть"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * @OA\Property(property="status", type="string", example="active"),
+     * @OA\Property(property="cancellation_policy", type="string", example="cancellation_policy"),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * )
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Ресторан не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Chain not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Ресторан не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1"),
+     * )
+     * ),
+     * )
+     */
+    public function update(UpdateRequest $request, int $id): RestaurantResource
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('update', $restaurant);
+
+        $dto = $request->toDto();
+
+        $updatedRestaurant = $this->restaurantService->updateRestaurant($restaurant, $dto);
+
+        return new RestaurantResource($updatedRestaurant);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/restaurants/{id}",
+     * tags={"Restaurants"},
+     * summary="Удаление ресторана",
+     * description="Удаление ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Ресторан успешно удален",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Сеть ресторана не найдена",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="Chain not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Сеть ресторана не найдена!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1"),
+     * )
+     * ),
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('delete', $restaurant);
+
+        $this->restaurantService->deleteRestaurant($restaurant, true);
+
+        return response()->json(null, 204);
     }
 }
