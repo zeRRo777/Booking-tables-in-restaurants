@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Table\CreateTableDTO;
 use App\DTOs\Table\TableFilterDTO;
 use App\Models\Restaurant;
 use App\Models\Table;
@@ -28,5 +29,18 @@ class EloquentTableRepository implements TableRepositoryInterface
     public function findById(int $id): Table|null
     {
         return Table::with('restaurant')->find($id);
+    }
+
+    public function create(CreateTableDTO $dto): Table
+    {
+        $table = Table::create([
+            'number' => $dto->number,
+            'restaurant_id' => $dto->restaurant_id,
+            'capacity_min' => $dto->capacity_min,
+            'capacity_max' => $dto->capacity_max,
+            'zone' => $dto->zone,
+        ]);
+
+        return $table->load('restaurant');
     }
 }

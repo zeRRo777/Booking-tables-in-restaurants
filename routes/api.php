@@ -85,6 +85,7 @@ Route::middleware('throttle:api')->group(function (): void {
         Route::controller(TableController::class)->group(function () {
             Route::get('/restaurants/{id}/tables', 'index');
             Route::get('/tables/{id}', 'show');
+            Route::post('/tables', 'store');
         });
     });
 

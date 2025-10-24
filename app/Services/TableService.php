@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\DTOs\Table\CreateTableDTO;
 use App\DTOs\Table\TableFilterDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
@@ -30,5 +31,10 @@ class TableService
         }
 
         return $table;
+    }
+
+    public function createTable(CreateTableDTO $dto): Table
+    {
+        return $this->tableRepository->create($dto);
     }
 }
