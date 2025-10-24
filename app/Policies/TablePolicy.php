@@ -33,4 +33,17 @@ class TablePolicy
 
         return false;
     }
+
+    public function delete(User $user, Table $table): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        if ($user->hasRole('admin_restaurant')) {
+            return $table->restaurant->administrators()->where('user_id', $user->id)->exists();
+        }
+
+        return false;
+    }
 }

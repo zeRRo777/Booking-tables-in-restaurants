@@ -45,7 +45,7 @@ class StoreRequest extends FormRequest
                     return $query->where('restaurant_id', $this->restaurant_id);
                 }),
             ],
-            'capacity_min' => ['required', 'integer', 'min:1'],
+            'capacity_min' => ['required', 'integer', 'min:1', 'lte:capacity_max',],
             'capacity_max' => ['required', 'integer', 'gte:capacity_min'],
             'zone' => ['nullable', 'string', 'max:255'],
             'restaurant_id' => ['required', 'integer', 'exists:restaurants,id'],

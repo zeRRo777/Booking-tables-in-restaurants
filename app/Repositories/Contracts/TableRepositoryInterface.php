@@ -15,4 +15,8 @@ interface TableRepositoryInterface
     public function findById(int $id): ?Table;
 
     public function create(CreateTableDTO $dto): Table;
+
+    public function update(Table $table, array $data): bool;
+
+    public function delete(Table $table, bool $real = false): bool;
 }

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Table\IndexRequest;
 use App\Http\Requests\Table\StoreRequest;
+use App\Http\Requests\Table\UpdateRequest;
 use App\Http\Resources\TableCollection;
 use App\Http\Resources\TableResorce;
 use App\Http\Resources\TableResource;
 use App\Models\Table;
 use App\Services\RestaurantService;
 use App\Services\TableService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -308,5 +310,193 @@ class TableController extends Controller
         $table = $this->tableService->createTable($dto);
 
         return new TableResource($table);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/tables/{id}",
+     * tags={"Tables"},
+     * summary="Изменение данных столика в ресторане",
+     * description="Изменение данных столика в ресторане",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID столика",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="zone", type="string", example="Updated zone"),
+     * @OA\Property(property="number", type="integer", example="1"),
+     * @OA\Property(property="capacity_min", type="integer", example="1"),
+     * @OA\Property(property="capacity_max", type="integer", example="1"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Столик в ресторане успешно изменен",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект столика ресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="number", type="integer", example=1),
+     * @OA\Property(property="capacity_min", type="integer", example=1),
+     * @OA\Property(property="capacity_max", type="integer", example=1),
+     * @OA\Property(property="zone", type="string", example="Тестовая зона"),
+     * @OA\Property(
+     * property="restaurant",
+     * type="object",
+     * description="Ресторан",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * ),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Ресторан не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Столик не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1"),
+     * )
+     * ),
+     * )
+     */
+    public function update(UpdateRequest $request, int $id): TableResource
+    {
+        $table = $this->tableService->getTable($id);
+
+        $dto = $request->toDto();
+
+        $table = $this->tableService->updateTable($table, $dto);
+
+        return new TableResource($table);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/tables/{id}",
+     * tags={"Tables"},
+     * summary="Удаление столика в ресторане",
+     * description="Удаление столика в ресторане",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID столика в ресторане",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Столик в ресторане успешно удален",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Столик в ресторане не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Столик в ресторане не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/tables/1"),
+     * )
+     * ),
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $table = $this->tableService->getTable($id);
+
+        Gate::authorize('delete', $table);
+
+        $this->tableService->deleteTable($table, true);
+
+        return response()->json(null, 204);
     }
 }

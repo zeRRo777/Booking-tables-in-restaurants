@@ -43,4 +43,14 @@ class EloquentTableRepository implements TableRepositoryInterface
 
         return $table->load('restaurant');
     }
+
+    public function update(Table $table, array $data): bool
+    {
+        return $table->update($data);
+    }
+
+    public function delete(Table $table, bool $real = false): bool
+    {
+        return $real ? $table->forceDelete() : $table->delete();
+    }
 }

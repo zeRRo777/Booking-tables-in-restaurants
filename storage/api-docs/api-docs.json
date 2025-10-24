@@ -4693,6 +4693,421 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "delete": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Удаление столика в ресторане",
+                "description": "Удаление столика в ресторане",
+                "operationId": "95d919d886f901a96ed38ede04182e0a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID столика в ресторане",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Столик в ресторане успешно удален"
+                    },
+                    "401": {
+                        "description": "Вы не авторизованы",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/unauthorized"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу доступен только авторизованным пользователям!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Столик в ресторане не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/not-found"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Столик в ресторане не найден!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутрення ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/database-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Database Error"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "500"
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка базы данных!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Изменение данных столика в ресторане",
+                "description": "Изменение данных столика в ресторане",
+                "operationId": "e14a559b5c8e7fd0ab637dc87d79fa59",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID столика",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "zone": {
+                                        "type": "string",
+                                        "example": "Updated zone"
+                                    },
+                                    "number": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "capacity_min": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "capacity_max": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Столик в ресторане успешно изменен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Объект столика ресторана",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "number": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "capacity_min": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "capacity_max": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "zone": {
+                                                    "type": "string",
+                                                    "example": "Тестовая зона"
+                                                },
+                                                "restaurant": {
+                                                    "description": "Ресторан",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Тестовый ресторан"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла одна или несколько ошибок проверки."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Поле email обязательно для заполнения."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ресторан не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/not-found"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Столик не найден!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутрення ошибка сервера",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/database-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Database Error"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "500"
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла ошибка базы данных!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/tables/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/tables": {
