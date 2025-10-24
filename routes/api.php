@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TableController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyController;
@@ -12,6 +13,7 @@ use App\Http\Middleware\ValidateTokenInDatabase;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
+use App\Models\Table;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -78,6 +80,11 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::patch('/restaurants/{id}', 'update');
             Route::delete('/restaurants/{id}', 'destroy');
             Route::patch('/restaurants/{id}/status', 'changeStatus')->can('changeStatus', Restaurant::class);
+        });
+
+        Route::controller(TableController::class)->group(function () {
+            Route::get('/restaurants/{id}/tables', 'index');
+            Route::get('/tables/{id}', 'show');
         });
     });
 

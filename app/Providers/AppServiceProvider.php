@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
+use App\Models\Table;
 use App\Models\User;
 use App\Policies\ChainPolicy;
 use App\Policies\RestaurantPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\TablePolicy;
 use App\Policies\UserPolicy;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use App\Repositories\Contracts\EmailChangeRepositoryInterface;
@@ -18,6 +20,7 @@ use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
+use App\Repositories\Contracts\TableRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\UserTokensRepositoryInterface;
 use App\Repositories\Eloquent\EloquentChainRepository;
@@ -28,6 +31,7 @@ use App\Repositories\Eloquent\EloquentPhoneChangeRepository;
 use App\Repositories\Eloquent\EloquentPhoneVerifiedRepository;
 use App\Repositories\Eloquent\EloquentRestaurantRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
+use App\Repositories\Eloquent\EloquentTableRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
 use App\Repositories\Eloquent\EloquentUserTokensRepository;
 use Illuminate\Support\Facades\Artisan;
@@ -54,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RoleRepositoryInterface::class, EloquentRoleRepository::class);
         $this->app->bind(ChainRepositoryInterface::class, EloquentChainRepository::class);
         $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
+        $this->app->bind(TableRepositoryInterface::class, EloquentTableRepository::class);
     }
 
     /**
@@ -85,5 +90,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(RestaurantChain::class, ChainPolicy::class);
         Gate::policy(Restaurant::class, RestaurantPolicy::class);
+        Gate::policy(Table::class, TablePolicy::class);
     }
 }
