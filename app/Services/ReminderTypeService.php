@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\DTOs\ReminderType\CreateReminderTypeDTO;
 use App\DTOs\ReminderType\ReminderTypeFilterDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\ReminderType;
 use App\Repositories\Contracts\ReminderTypeInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ReminderTypeService
 {
@@ -28,5 +30,16 @@ class ReminderTypeService
         }
 
         return $reminderType;
+    }
+
+    public function createType(CreateReminderTypeDTO $dto): ReminderType
+    {
+        return DB::transaction(function () use ($dto): ReminderType {
+            if ($dto->is_default) {
+                $this->reminderTypeRepository->resetDefault();
+            }
+
+            return $this->reminderTypeRepository->create($dto);
+        });
     }
 }

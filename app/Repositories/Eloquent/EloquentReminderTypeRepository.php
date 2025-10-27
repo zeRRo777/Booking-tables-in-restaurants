@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\ReminderType\CreateReminderTypeDTO;
 use App\DTOs\ReminderType\ReminderTypeFilterDTO;
 use App\Models\ReminderType;
 use App\Repositories\Contracts\ReminderTypeInterface;
@@ -21,5 +22,21 @@ class EloquentReminderTypeRepository implements ReminderTypeInterface
     public function getById(int $id): ReminderType|null
     {
         return ReminderType::find($id);
+    }
+
+    public function create(CreateReminderTypeDTO $dto): ReminderType
+    {
+        return ReminderType::create(
+            [
+                'name' => $dto->name,
+                'minutes_before' => $dto->minutes_before,
+                'is_default' => $dto->is_default,
+            ]
+        );
+    }
+
+    public function resetDefault(): bool
+    {
+        return ReminderType::where('is_default', true)->update(['is_default' => false]);
     }
 }
