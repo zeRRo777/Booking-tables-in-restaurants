@@ -6,6 +6,7 @@ use App\Models\ReminderType;
 use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
+use App\Models\RestaurantSchedule;
 use App\Models\Role;
 use App\Models\Table;
 use App\Models\User;
@@ -13,6 +14,7 @@ use App\Policies\ChainPolicy;
 use App\Policies\ReminderTypePolicy;
 use App\Policies\ReservationStatusePolicy;
 use App\Policies\RestaurantPolicy;
+use App\Policies\RestaurantSchedulePolicy;
 use App\Policies\RolePolicy;
 use App\Policies\TablePolicy;
 use App\Policies\UserPolicy;
@@ -25,6 +27,7 @@ use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
 use App\Repositories\Contracts\ReminderTypeInterface;
 use App\Repositories\Contracts\ReservationStatuseRepositoryInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
+use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\TableRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -38,6 +41,7 @@ use App\Repositories\Eloquent\EloquentPhoneVerifiedRepository;
 use App\Repositories\Eloquent\EloquentReminderTypeRepository;
 use App\Repositories\Eloquent\EloquentReservationStatuseRepository;
 use App\Repositories\Eloquent\EloquentRestaurantRepository;
+use App\Repositories\Eloquent\EloquentRestaurantScheduleRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
 use App\Repositories\Eloquent\EloquentTableRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
@@ -69,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TableRepositoryInterface::class, EloquentTableRepository::class);
         $this->app->bind(ReminderTypeInterface::class, EloquentReminderTypeRepository::class);
         $this->app->bind(ReservationStatuseRepositoryInterface::class, EloquentReservationStatuseRepository::class);
+        $this->app->bind(RestaurantScheduleRepositoryInterface::class, EloquentRestaurantScheduleRepository::class);
     }
 
     /**
@@ -103,5 +108,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Table::class, TablePolicy::class);
         Gate::policy(ReminderType::class, ReminderTypePolicy::class);
         Gate::policy(ReservationStatuse::class, ReservationStatusePolicy::class);
+        Gate::policy(RestaurantSchedule::class, RestaurantSchedulePolicy::class);
     }
 }

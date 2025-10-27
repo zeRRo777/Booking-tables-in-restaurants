@@ -16,6 +16,7 @@ use App\Models\ReminderType;
 use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
+use App\Models\RestaurantSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +86,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::patch('/restaurants/{id}', 'update');
             Route::delete('/restaurants/{id}', 'destroy');
             Route::patch('/restaurants/{id}/status', 'changeStatus')->can('changeStatus', Restaurant::class);
+            Route::get('/restaurants/{id}/schedules', 'restaurantSchedules');
         });
 
         Route::controller(TableController::class)->group(function () {

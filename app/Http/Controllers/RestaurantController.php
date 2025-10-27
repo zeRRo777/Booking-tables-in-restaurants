@@ -6,10 +6,13 @@ use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
+use App\Http\Requests\Restaurant\Schedules\IndexRequest as SchedulesIndexRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Requests\Restaurant\UpdateRequest;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
+use App\Http\Resources\RestaurantScheduleCollection;
+use App\Models\RestaurantSchedule;
 use App\Services\RestaurantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +21,12 @@ use Illuminate\Support\Facades\Gate;
  * @OA\Tag(
  * name="Restaurants",
  * description="API для получение информации о ресторанах"
+ * )
+ */
+/**
+ * @OA\Tag(
+ * name="RestaurantsSchedules",
+ * description="API для получение информации о дополнительном времени работы ресторана"
  * )
  */
 class RestaurantController extends Controller
@@ -729,5 +738,123 @@ class RestaurantController extends Controller
         $upadatedRestaurant = $this->restaurantService->changeStatus($id, $dto);
 
         return new RestaurantResource($upadatedRestaurant);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/restaurants/{id}/schedules",
+     * tags={"RestaurantSchedules"},
+     * summary="Получение списка дполнительного времени работы ресторана",
+     * description="Получение списка дполнительного времени работы ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана для получения",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="date_start",
+     * in="query",
+     * description="Поиск по дате с",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * * @OA\Parameter(
+     * name="date_end",
+     * in="query",
+     * description="Поиск по дате до",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"date", "created_at"},
+     * default="created_at"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка дополнительного времени работы ресторана",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив доп времени работы ресторана",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="date", type="string", example="28.02.2001"),
+     * @OA\Property(property="opens_at", type="string", example="18.00"),
+     * @OA\Property(property="closes_at", type="string", example="20:00"),
+     * @OA\Property(property="is_closed", type="boolean", example="true"),
+     * @OA\Property(property="description", type="string", example="тестовое описание"),
+     * @OA\Property(
+     * property="restaurant",
+     * type="object",
+     * description="Ресторан",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * ),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * )
+     * )
+     */
+    public function restaurantSchedules(SchedulesIndexRequest $request, int $id): RestaurantScheduleCollection
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('viewAny', [RestaurantSchedule::class, $restaurant]);
+
+        $dto = $request->toDto();
+
+        $schedules = $this->restaurantService->getSchedules($restaurant, $dto);
+
+        return new RestaurantScheduleCollection($schedules);
     }
 }

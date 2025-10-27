@@ -5014,6 +5014,187 @@
                 ]
             }
         },
+        "/restaurants/{id}/schedules": {
+            "get": {
+                "tags": [
+                    "RestaurantSchedules"
+                ],
+                "summary": "Получение списка дполнительного времени работы ресторана",
+                "description": "Получение списка дполнительного времени работы ресторана",
+                "operationId": "878691bce74db206e4dcfa6701ee2e3a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID ресторана для получения",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Поиск по дате с",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Поиск по дате до",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Поле сортировки",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "date",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Направление сортировки",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Номер страницы",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Количество элементов на странице",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение списка дополнительного времени работы ресторана",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Массив доп времени работы ресторана",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "example": "28.02.2001"
+                                                    },
+                                                    "opens_at": {
+                                                        "type": "string",
+                                                        "example": "18.00"
+                                                    },
+                                                    "closes_at": {
+                                                        "type": "string",
+                                                        "example": "20:00"
+                                                    },
+                                                    "is_closed": {
+                                                        "type": "boolean",
+                                                        "example": "true"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "тестовое описание"
+                                                    },
+                                                    "restaurant": {
+                                                        "description": "Ресторан",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Тестовый ресторан"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "13.10.2025 16:58:09"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Пагинация",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 56
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "count_pages": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/roles": {
             "get": {
                 "tags": [
@@ -9249,10 +9430,6 @@
             "description": "API для получение информации о статусах бронирования"
         },
         {
-            "name": "Restaurants",
-            "description": "API для получение информации о ресторанах"
-        },
-        {
             "name": "Roles",
             "description": "API для ролей"
         },
@@ -9271,6 +9448,14 @@
         {
             "name": "Verify",
             "description": "API для подтверждения почты и телефона"
+        },
+        {
+            "name": "Restaurants",
+            "description": "Restaurants"
+        },
+        {
+            "name": "RestaurantSchedules",
+            "description": "RestaurantSchedules"
         },
         {
             "name": "Health",

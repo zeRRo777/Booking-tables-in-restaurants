@@ -5,19 +5,22 @@ namespace App\Services;
 use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
+use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
 use App\Models\RestaurantStatuse;
 use App\Models\User;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
+use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class RestaurantService
 {
     public function __construct(
-        protected RestaurantRepositoryInterface $restaurantRepository
+        protected RestaurantRepositoryInterface $restaurantRepository,
+        protected RestaurantScheduleRepositoryInterface $restaurantScheduleRepository
     ) {}
 
     public function getRestaurants(RestaurantFilterDTO $dto, ?User $user): LengthAwarePaginator
@@ -95,5 +98,12 @@ class RestaurantService
         $this->restaurantRepository->update($resataurant, $data);
 
         return $resataurant->refresh()->load(['status', 'chain']);
+    }
+
+    public function getSchedules(Restaurant $restaurant, RestaurantScheduleFilterDTO $dto): LengthAwarePaginator
+    {
+        $query = $restaurant->schedules()->getQuery();
+
+        return $this->restaurantScheduleRepository->applyFiltersAndPaginate($query, $dto);
     }
 }
