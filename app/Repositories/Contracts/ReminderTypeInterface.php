@@ -16,4 +16,6 @@ interface ReminderTypeInterface
     public function create(CreateReminderTypeDTO $dto): ReminderType;
 
     public function resetDefault(): bool;
+
+    public function update(ReminderType $reminderType, array $data): bool;
 }

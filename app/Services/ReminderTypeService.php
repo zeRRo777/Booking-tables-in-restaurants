@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\ReminderType\CreateReminderTypeDTO;
 use App\DTOs\ReminderType\ReminderTypeFilterDTO;
+use App\DTOs\ReminderType\UpdateReminderTypeDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\ReminderType;
 use App\Repositories\Contracts\ReminderTypeInterface;
@@ -41,5 +42,27 @@ class ReminderTypeService
 
             return $this->reminderTypeRepository->create($dto);
         });
+    }
+
+    public function updateType(ReminderType $type, UpdateReminderTypeDTO $dto): ReminderType
+    {
+        $data = array_filter(
+            $dto->toArray(),
+            fn($value) => !is_null($value)
+        );
+
+        if (empty($data)) {
+            return $type;
+        }
+
+        DB::transaction(function () use ($type, $data, $dto): void {
+            if ($dto->is_default) {
+                $this->reminderTypeRepository->resetDefault();
+            }
+
+            $this->reminderTypeRepository->update($type, $data);
+        });
+
+        return $type->refresh();
     }
 }

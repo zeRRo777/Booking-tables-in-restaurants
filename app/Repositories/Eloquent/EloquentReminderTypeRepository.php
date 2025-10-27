@@ -39,4 +39,9 @@ class EloquentReminderTypeRepository implements ReminderTypeInterface
     {
         return ReminderType::where('is_default', true)->update(['is_default' => false]);
     }
+
+    public function update(ReminderType $reminderType, array $data): bool
+    {
+        return $reminderType->update($data);
+    }
 }
