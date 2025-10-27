@@ -36,4 +36,9 @@ class EloquentRoleRepository implements RoleRepositoryInterface
     {
         return Role::find($id);
     }
+
+    public function findByName(string $name): Role|null
+    {
+        return Role::where('name', $name)->first();
+    }
 }

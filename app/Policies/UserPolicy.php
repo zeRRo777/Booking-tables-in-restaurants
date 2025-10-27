@@ -46,4 +46,14 @@ class UserPolicy
     {
         return $user->hasRole('superadmin');
     }
+
+    public function addRole(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
+
+    public function removeRole(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
 }

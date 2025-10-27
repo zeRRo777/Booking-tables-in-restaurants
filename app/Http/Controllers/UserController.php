@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\StoreUserRoleRequest;
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\UpdateMeRequest;
 use App\Http\Requests\User\UpdateRequest as UserUpdateRequest;
@@ -659,6 +660,164 @@ class UserController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $this->userService->deleteUser($id, true);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/users/{id}/role",
+     * tags={"Users"},
+     * summary="Добавление роли для пользователя",
+     * description="Добавление роли для пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="name", type="string", example="superadmin"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Роль успешно добавлена",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role"),
+     * )
+     * ),
+     * )
+     */
+    public function addRole(StoreUserRoleRequest $request, int $id): JsonResponse
+    {
+        $dto = $request->toDto();
+
+        $this->userService->addRole($id, $dto);
+
+        return response()->json(null, 204);
+    }
+
+
+    /**
+     * @OA\Delete(
+     * path="/users/{user_id}/role/{role_id}",
+     * tags={"Users"},
+     * summary="Удаление роли для пользователя",
+     * description="Удаление роли для пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="user_id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * * @OA\Parameter(
+     * name="role_id",
+     * in="path",
+     * description="ID роли",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Роль успешно удалена",
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/users/1/role/1"),
+     * )
+     * ),
+     * )
+     */
+    public function removeRole(int $user_id, int $role_id): JsonResponse
+    {
+        $this->userService->removeRole($user_id, $role_id);
 
         return response()->json(null, 204);
     }

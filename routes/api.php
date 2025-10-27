@@ -44,6 +44,8 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/users', 'store')->can('create', User::class);
             Route::patch('/users/{id}', 'update')->can('update', User::class);
             Route::delete('/users/{id}', 'destroy')->can('delete', User::class);
+            Route::post('/users/{id}/role', 'addRole')->can('addRole', User::class);
+            Route::delete('/users/{user_id}/role/{role_id}', 'removeRole')->can('removeRole', User::class);
         });
 
         Route::controller(AuthController::class)->group(function (): void {

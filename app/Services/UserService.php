@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use App\DTOs\Contracts\UpdateUserDtoInterface;
+use App\DTOs\User\AddUserRoleDTO;
 use App\DTOs\User\CreateUserDTO;
 use App\DTOs\User\UserFilterDTO;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\UserNotHaveRoleException;
+use App\Http\Requests\StoreUserRoleRequest;
 use App\Models\Role;
 use App\Models\User;
+use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +21,8 @@ class UserService
 {
     public function __construct(
         protected UserRepositoryInterface $userRepository,
+        protected RoleRepositoryInterface $roleRepository,
+        protected RoleService $roleService,
     ) {}
 
     public function createUser(CreateUserDTO $dto): User
@@ -80,5 +86,33 @@ class UserService
         }
 
         return $user;
+    }
+
+    public function addRole(int $idUser, AddUserRoleDTO $dto): void
+    {
+        $user = $this->getUser($idUser);
+        $role = $this->roleRepository->findByName($dto->name);
+
+        if (!$role) {
+            throw new NotFoundException('Роль не найдена!');
+        }
+
+        DB::transaction(function () use ($user, $role): void {
+            $user->roles()->syncWithoutDetaching([$role->id]);
+        });
+    }
+
+    public function removeRole(int $idUser, int $idRole): void
+    {
+        $user = $this->getUser($idUser);
+        $role = $this->roleService->findRoleById($idRole);
+
+        if (!$user->hasRole($role->name)) {
+            throw new UserNotHaveRoleException('Пользователь не имеет данной роли!');
+        }
+
+        DB::transaction(function () use ($user, $role): void {
+            $user->roles()->detach($role);
+        });
     }
 }

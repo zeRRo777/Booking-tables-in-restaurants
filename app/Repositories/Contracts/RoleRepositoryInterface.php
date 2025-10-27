@@ -16,4 +16,5 @@ interface RoleRepositoryInterface
     public function delete(Role $role, bool $real = false): bool;
 
     public function findById(int $id): ?Role;
+    public function findByName(string $name): ?Role;
 }
