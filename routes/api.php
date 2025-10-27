@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainController;
 use App\Http\Controllers\ReminderTypeController;
+use App\Http\Controllers\ReservationStatuseController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TableController;
@@ -12,10 +13,10 @@ use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use App\Models\ReminderType;
+use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
-use App\Models\Table;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -100,6 +101,14 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::patch('/reminder_types/{id}', 'update')->can('update', ReminderType::class);
             Route::delete('/reminder_types/{id}', 'destroy')->can('delete', ReminderType::class);
             Route::post('/reminder_types', 'store')->can('create', ReminderType::class);
+        });
+
+        Route::controller(ReservationStatuseController::class)->group(function () {
+            Route::get('/reservation_statuses', 'index')->can('viewAny', ReservationStatuse::class);
+            Route::get('/reservation_statuses/{id}', 'show')->can('view', ReservationStatuse::class);
+            Route::patch('/reservation_statuses/{id}', 'update')->can('update', ReservationStatuse::class);
+            Route::delete('/reservation_statuses/{id}', 'destroy')->can('delete', ReservationStatuse::class);
+            Route::post('/reservation_statuses', 'store')->can('create', ReservationStatuse::class);
         });
     });
 
