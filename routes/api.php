@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainController;
+use App\Http\Controllers\ReminderTypeController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TableController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
+use App\Models\ReminderType;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\Role;
@@ -90,6 +92,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/tables', 'store');
             Route::patch('/tables/{id}', 'update');
             Route::delete('/tables/{id}', 'destroy');
+        });
+
+        Route::controller(ReminderTypeController::class)->group(function () {
+            Route::get('/reminder_types', 'index')->can('viewAny', ReminderType::class);
         });
     });
 

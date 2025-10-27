@@ -18,6 +18,7 @@ use App\Repositories\Contracts\EmailVefiedRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
+use App\Repositories\Contracts\ReminderTypeInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\TableRepositoryInterface;
@@ -29,6 +30,7 @@ use App\Repositories\Eloquent\EloquentEmailVerifiedRepository;
 use App\Repositories\Eloquent\EloquentPasswordResetRepository;
 use App\Repositories\Eloquent\EloquentPhoneChangeRepository;
 use App\Repositories\Eloquent\EloquentPhoneVerifiedRepository;
+use App\Repositories\Eloquent\EloquentReminderTypeRepository;
 use App\Repositories\Eloquent\EloquentRestaurantRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
 use App\Repositories\Eloquent\EloquentTableRepository;
@@ -59,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChainRepositoryInterface::class, EloquentChainRepository::class);
         $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
         $this->app->bind(TableRepositoryInterface::class, EloquentTableRepository::class);
+        $this->app->bind(ReminderTypeInterface::class, EloquentReminderTypeRepository::class);
     }
 
     /**
