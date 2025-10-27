@@ -17,4 +17,9 @@ class EloquentReminderTypeRepository implements ReminderTypeInterface
 
         return $query->paginate($dto->per_page);
     }
+
+    public function getById(int $id): ReminderType|null
+    {
+        return ReminderType::find($id);
+    }
 }

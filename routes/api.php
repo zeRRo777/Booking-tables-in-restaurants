@@ -96,6 +96,7 @@ Route::middleware('throttle:api')->group(function (): void {
 
         Route::controller(ReminderTypeController::class)->group(function () {
             Route::get('/reminder_types', 'index')->can('viewAny', ReminderType::class);
+            Route::get('/reminder_types/{id}', 'show')->can('view', ReminderType::class);
         });
     });
 

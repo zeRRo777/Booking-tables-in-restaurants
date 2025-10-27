@@ -10,4 +10,9 @@ class ReminderTypePolicy
     {
         return $user->hasRole('superadmin');
     }
+
+    public function view(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
 }

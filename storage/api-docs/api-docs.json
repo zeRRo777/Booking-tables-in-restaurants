@@ -2147,6 +2147,138 @@
                 ]
             }
         },
+        "/reminder_types/{id}": {
+            "get": {
+                "tags": [
+                    "ReminderTypes"
+                ],
+                "summary": "Получение типа напоминания по id",
+                "description": "Получение типа напоминания по id",
+                "operationId": "74aa03430c871c00d9af1003ba73b71a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID типа напоминания",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение типа напоминания",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Объект типа напоминания",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "1d"
+                                                },
+                                                "minutes": {
+                                                    "type": "integer",
+                                                    "example": "1440"
+                                                },
+                                                "is_default": {
+                                                    "type": "boolean",
+                                                    "example": "true"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "13.10.2025 16:58:09"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Тип напоминания не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/chain-not-found"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Chain not Found"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Тип напоминания не найден!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/reminder_types/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/reminder_types/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/restaurants": {
             "get": {
                 "tags": [
