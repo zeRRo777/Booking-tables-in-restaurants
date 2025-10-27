@@ -3,6 +3,8 @@
 namespace App\Repositories\Eloquent;
 
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
+use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
+use App\Models\RestaurantSchedule;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -27,5 +29,12 @@ class EloquentRestaurantScheduleRepository implements RestaurantScheduleReposito
         $query->when($dto->date_end, function (Builder $q) use ($dto) {
             $q->where('date', '<=', $dto->date_end);
         });
+    }
+
+    public function findByRestaurantAndDate(RestaurantScheduleShowDTO $dto): RestaurantSchedule|null
+    {
+        return RestaurantSchedule::where('restaurant_id', $dto->id)
+            ->where('date', $dto->date)
+            ->first();
     }
 }

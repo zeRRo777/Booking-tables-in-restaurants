@@ -7,11 +7,13 @@ use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\Schedules\IndexRequest as SchedulesIndexRequest;
+use App\Http\Requests\Restaurant\Schedules\ShowRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Requests\Restaurant\UpdateRequest;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Http\Resources\RestaurantScheduleCollection;
+use App\Http\Resources\RestaurantScheduleResource;
 use App\Models\RestaurantSchedule;
 use App\Services\RestaurantService;
 use Illuminate\Http\JsonResponse;
@@ -856,5 +858,94 @@ class RestaurantController extends Controller
         $schedules = $this->restaurantService->getSchedules($restaurant, $dto);
 
         return new RestaurantScheduleCollection($schedules);
+    }
+
+    /**
+     * @OA\GET(
+     * path="/restaurants/{id}/schedules/{date}",
+     * tags={"RestaurantSchedules"},
+     * summary="Получение дполнительного времени работы ресторана",
+     * description="Получение дполнительного времени работы ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторанa",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="date",
+     * in="path",
+     * description="дата",
+     * required=true,
+     * @OA\Schema(
+     * type="string",
+     * example="28.02.2001"
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение доп времени",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект доп времениресторана",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="date", type="string", example="28.02.2001"),
+     * @OA\Property(property="opens_at", type="string", example="18.00"),
+     * @OA\Property(property="closes_at", type="string", example="20:00"),
+     * @OA\Property(property="is_closed", type="boolean", example="true"),
+     * @OA\Property(property="description", type="string", example="тестовое описание"),
+     * @OA\Property(
+     * property="restaurant",
+     * type="object",
+     * description="Ресторан",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * ),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Расписание не найдено",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     * @OA\Property(property="title", type="string", example="Object not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Расписание не найдено!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/schedules/28.02.2001")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/schedules/28.02.2001")
+     * )
+     * ),
+     * )
+     */
+    public function resraurantSchedule(ShowRequest $request, int $id, string $date): RestaurantScheduleResource
+    {
+        $dto = $request->toDto();
+
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('view', [RestaurantSchedule::class, $restaurant]);
+
+        $schedule = $this->restaurantService->getSchedule($dto);
+
+        return new RestaurantScheduleResource($schedule);
     }
 }

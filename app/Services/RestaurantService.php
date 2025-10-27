@@ -6,9 +6,11 @@ use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
+use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
+use App\Models\RestaurantSchedule;
 use App\Models\RestaurantStatuse;
 use App\Models\User;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
@@ -105,5 +107,16 @@ class RestaurantService
         $query = $restaurant->schedules()->getQuery();
 
         return $this->restaurantScheduleRepository->applyFiltersAndPaginate($query, $dto);
+    }
+
+    public function getSchedule(RestaurantScheduleShowDTO $dto): RestaurantSchedule
+    {
+        $schedule = $this->restaurantScheduleRepository->findByRestaurantAndDate($dto);
+
+        if (!$schedule) {
+            throw new NotFoundException('Расписание не найдено!');
+        }
+
+        return $schedule;
     }
 }

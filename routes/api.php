@@ -87,6 +87,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::delete('/restaurants/{id}', 'destroy');
             Route::patch('/restaurants/{id}/status', 'changeStatus')->can('changeStatus', Restaurant::class);
             Route::get('/restaurants/{id}/schedules', 'restaurantSchedules');
+            Route::get('/restaurants/{id}/schedules/{date}', 'resraurantSchedule');
         });
 
         Route::controller(TableController::class)->group(function () {
