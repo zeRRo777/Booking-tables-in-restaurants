@@ -98,6 +98,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/reminder_types', 'index')->can('viewAny', ReminderType::class);
             Route::get('/reminder_types/{id}', 'show')->can('view', ReminderType::class);
             Route::patch('/reminder_types/{id}', 'update')->can('update', ReminderType::class);
+            Route::delete('/reminder_types/{id}', 'destroy')->can('delete', ReminderType::class);
             Route::post('/reminder_types', 'store')->can('create', ReminderType::class);
         });
     });

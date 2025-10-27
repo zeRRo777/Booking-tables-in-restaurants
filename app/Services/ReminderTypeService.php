@@ -65,4 +65,13 @@ class ReminderTypeService
 
         return $type->refresh();
     }
+
+    public function deleteType(int $id): void
+    {
+        $type = $this->getType($id);
+
+        DB::transaction(function () use ($type): void {
+            $this->reminderTypeRepository->delete($type);
+        });
+    }
 }

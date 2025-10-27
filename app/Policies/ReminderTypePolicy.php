@@ -25,4 +25,9 @@ class ReminderTypePolicy
     {
         return $user->hasRole('superadmin');
     }
+
+    public function delete(User $user): bool
+    {
+        return $user->hasRole('superadmin');
+    }
 }

@@ -44,4 +44,9 @@ class EloquentReminderTypeRepository implements ReminderTypeInterface
     {
         return $reminderType->update($data);
     }
+
+    public function delete(ReminderType $reminderType): bool
+    {
+        return $reminderType->delete();
+    }
 }

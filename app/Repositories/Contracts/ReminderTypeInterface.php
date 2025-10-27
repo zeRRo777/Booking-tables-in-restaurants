@@ -18,4 +18,6 @@ interface ReminderTypeInterface
     public function resetDefault(): bool;
 
     public function update(ReminderType $reminderType, array $data): bool;
+
+    public function delete(ReminderType $reminderType): bool;
 }
