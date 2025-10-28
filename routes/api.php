@@ -89,6 +89,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/restaurants/{id}/schedules', 'restaurantSchedules');
             Route::get('/restaurants/{id}/schedules/{date}', 'resraurantSchedule');
             Route::post('/restaurants/{id}/schedules', 'restaurantScheduleStore');
+            Route::patch('/restaurants/{id}/schedules/{date}', 'restaurantScheduleUpdate');
         });
 
         Route::controller(TableController::class)->group(function () {

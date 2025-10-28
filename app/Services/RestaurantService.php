@@ -9,6 +9,7 @@ use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
+use App\DTOs\Restaurant\UpdateRestaurantScheduleDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
@@ -118,11 +119,41 @@ class RestaurantService
             throw new NotFoundException('Расписание не найдено!');
         }
 
-        return $schedule;
+        return $schedule->load(['restaurant']);
     }
 
     public function createSchedule(CreateRestaurantScheduleDTO $dto): RestaurantSchedule
     {
-        return $this->restaurantScheduleRepository->create($dto);
+        $schedule = $this->restaurantScheduleRepository->create($dto);
+
+        return $schedule->load(['restaurant']);
+    }
+
+    public function updateSchedule(RestaurantSchedule $schedule, UpdateRestaurantScheduleDTO $dto): RestaurantSchedule
+    {
+        $data = $dto->except('opens_at', 'closes_at')->toArray();
+
+        if (!is_null($dto->opens_at)) {
+            $data['opens_at'] = $dto->opens_at->format('H:i:s');
+        }
+
+        if (!is_null($dto->closes_at)) {
+            $data['closes_at'] = $dto->closes_at->format('H:i:s');
+        }
+
+        $data = array_filter($data, fn($value) => !is_null($value));
+
+        if (empty($data)) {
+            return $schedule;
+        }
+
+        $this->restaurantScheduleRepository->update($schedule, $data);
+
+        $dtoShow = RestaurantScheduleShowDTO::from([
+            'date' => $schedule->date,
+            'id' => $schedule->restaurant_id,
+        ]);
+
+        return $this->restaurantScheduleRepository->findByRestaurantAndDate($dtoShow)->load(['restaurant']);
     }
 }

@@ -16,4 +16,6 @@ interface RestaurantScheduleRepositoryInterface
     public function findByRestaurantAndDate(RestaurantScheduleShowDTO $dto): ?RestaurantSchedule;
 
     public function create(CreateRestaurantScheduleDTO $dto): RestaurantSchedule;
+
+    public function update(RestaurantSchedule $schedule, array $data): bool;
 }

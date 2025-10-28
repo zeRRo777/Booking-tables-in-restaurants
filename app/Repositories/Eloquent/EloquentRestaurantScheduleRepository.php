@@ -50,4 +50,11 @@ class EloquentRestaurantScheduleRepository implements RestaurantScheduleReposito
             'description' => $dto->description,
         ]);
     }
+
+    public function update(RestaurantSchedule $schedule, array $data): bool
+    {
+        return RestaurantSchedule::where('restaurant_id', $schedule->restaurant_id)
+            ->where('date', $schedule->date)
+            ->update($data);
+    }
 }

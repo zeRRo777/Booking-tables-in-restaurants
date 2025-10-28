@@ -23,7 +23,7 @@ class ShowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => ['required', 'date_format:d.m.Y'],
+            'date' => ['required', 'date_format:Y-m-d'],
             'id' => ['required', 'integer'],
         ];
     }

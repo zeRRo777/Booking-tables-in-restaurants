@@ -10,7 +10,7 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 class RestaurantScheduleShowDTO extends Data
 {
     public function __construct(
-        #[WithCast(DateTimeInterfaceCast::class, format: 'd.m.Y')]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public Carbon $date,
         public int $id,
     ) {}
