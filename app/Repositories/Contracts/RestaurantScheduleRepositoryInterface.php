@@ -18,4 +18,6 @@ interface RestaurantScheduleRepositoryInterface
     public function create(CreateRestaurantScheduleDTO $dto): RestaurantSchedule;
 
     public function update(RestaurantSchedule $schedule, array $data): bool;
+
+    public function delete(RestaurantSchedule $schedule, bool $real = false): bool;
 }

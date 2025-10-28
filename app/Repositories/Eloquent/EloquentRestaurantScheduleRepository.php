@@ -57,4 +57,17 @@ class EloquentRestaurantScheduleRepository implements RestaurantScheduleReposito
             ->where('date', $schedule->date)
             ->update($data);
     }
+
+    public function delete(RestaurantSchedule $schedule, bool $real = false): bool
+    {
+        if ($real) {
+            return RestaurantSchedule::where('restaurant_id', $schedule->restaurant_id)
+                ->where('date', $schedule->date)
+                ->forceDelete();
+        }
+
+        return RestaurantSchedule::where('restaurant_id', $schedule->restaurant_id)
+            ->where('date', $schedule->date)
+            ->delete();
+    }
 }

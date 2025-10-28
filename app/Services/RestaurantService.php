@@ -156,4 +156,11 @@ class RestaurantService
 
         return $this->restaurantScheduleRepository->findByRestaurantAndDate($dtoShow)->load(['restaurant']);
     }
+
+    public function deleteSchedule(RestaurantSchedule $schedule, bool $real = false): void
+    {
+        DB::transaction(function () use ($schedule, $real): void {
+            $this->restaurantScheduleRepository->delete($schedule, $real);
+        });
+    }
 }

@@ -7,6 +7,7 @@ use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
+use App\Http\Requests\Restaurant\Schedules\DeleteRequest;
 use App\Http\Requests\Restaurant\Schedules\IndexRequest as SchedulesIndexRequest;
 use App\Http\Requests\Restaurant\Schedules\ShowRequest;
 use App\Http\Requests\Restaurant\Schedules\StoreRequest as SchedulesStoreRequest;
@@ -1172,5 +1173,88 @@ class RestaurantController extends Controller
         $newSchedule = $this->restaurantService->updateSchedule($schedule, $dtoUpdate);
 
         return new RestaurantScheduleResource($newSchedule);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/restaurants/{id}/schedules/{date}",
+     * tags={"RestaurantSchedules"},
+     * summary="Удаление дополнительного времени работы ресторана",
+     * description="Удаление дополнительного времени работы ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторанa",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="date",
+     * in="path",
+     * description="дата",
+     * required=true,
+     * @OA\Schema(
+     * type="string",
+     * example="2001-02-28"
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Успешное удаление доп времени",
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/schedules/2001-02-28")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Доступ запрещен (нет прав)",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="Forbidden"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/schedules/2001-02-28")
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/schedules/2001-02-28"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле name обязательно для заполнения."))),
+     * )
+     * ),
+     * )
+     */
+    public function restaurantScheduleDestroy(DeleteRequest $request, int $id, string $date): JsonResponse
+    {
+        $dto = $request->toDto();
+
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('delete', [RestaurantSchedule::class, $restaurant]);
+
+        $schedule = $this->restaurantService->getSchedule($dto);
+
+        $this->restaurantService->deleteSchedule($schedule, true);
+
+        return response()->json(null, 204);
     }
 }
