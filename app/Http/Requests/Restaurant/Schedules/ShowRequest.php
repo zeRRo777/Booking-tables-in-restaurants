@@ -36,7 +36,7 @@ class ShowRequest extends FormRequest
         ];
     }
 
-    public function prepareForValidation()
+    public function prepareForValidation(): void
     {
         $this->merge([
             'date' => $this->route('date'),

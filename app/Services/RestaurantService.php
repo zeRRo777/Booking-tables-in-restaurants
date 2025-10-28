@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
+use App\DTOs\Restaurant\CreateRestaurantScheduleDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
@@ -118,5 +119,10 @@ class RestaurantService
         }
 
         return $schedule;
+    }
+
+    public function createSchedule(CreateRestaurantScheduleDTO $dto): RestaurantSchedule
+    {
+        return $this->restaurantScheduleRepository->create($dto);
     }
 }

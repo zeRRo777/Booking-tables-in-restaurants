@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Restaurant\CreateRestaurantScheduleDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\Models\RestaurantSchedule;
@@ -36,5 +37,17 @@ class EloquentRestaurantScheduleRepository implements RestaurantScheduleReposito
         return RestaurantSchedule::where('restaurant_id', $dto->id)
             ->where('date', $dto->date)
             ->first();
+    }
+
+    public function create(CreateRestaurantScheduleDTO $dto): RestaurantSchedule
+    {
+        return RestaurantSchedule::create([
+            'date' => $dto->date,
+            'restaurant_id' => $dto->restaurant_id,
+            'opens_at' => $dto->opens_at,
+            'closes_at' => $dto->closes_at,
+            'is_closed' => $dto->is_closed,
+            'description' => $dto->description,
+        ]);
     }
 }
