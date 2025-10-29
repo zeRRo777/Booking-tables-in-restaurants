@@ -5,6 +5,7 @@ use App\Http\Controllers\ChainController;
 use App\Http\Controllers\ReminderTypeController;
 use App\Http\Controllers\ReservationStatuseController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\TestController;
@@ -116,6 +117,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::delete('/reservation_statuses/{id}', 'destroy')->can('delete', ReservationStatuse::class);
             Route::post('/reservation_statuses', 'store')->can('create', ReservationStatuse::class);
         });
+    });
+
+    Route::controller(ReviewController::class)->group(function () {
+        Route::get('/restaurants/{id}/reviews', 'index');
     });
 
     Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);

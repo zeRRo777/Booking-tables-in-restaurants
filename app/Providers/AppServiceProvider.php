@@ -28,6 +28,7 @@ use App\Repositories\Contracts\ReminderTypeInterface;
 use App\Repositories\Contracts\ReservationStatuseRepositoryInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
+use App\Repositories\Contracts\ReviewRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\TableRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -42,6 +43,7 @@ use App\Repositories\Eloquent\EloquentReminderTypeRepository;
 use App\Repositories\Eloquent\EloquentReservationStatuseRepository;
 use App\Repositories\Eloquent\EloquentRestaurantRepository;
 use App\Repositories\Eloquent\EloquentRestaurantScheduleRepository;
+use App\Repositories\Eloquent\EloquentReviewRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
 use App\Repositories\Eloquent\EloquentTableRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
@@ -74,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ReminderTypeInterface::class, EloquentReminderTypeRepository::class);
         $this->app->bind(ReservationStatuseRepositoryInterface::class, EloquentReservationStatuseRepository::class);
         $this->app->bind(RestaurantScheduleRepositoryInterface::class, EloquentRestaurantScheduleRepository::class);
+        $this->app->bind(ReviewRepositoryInterface::class, EloquentReviewRepository::class);
     }
 
     /**
