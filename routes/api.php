@@ -17,7 +17,7 @@ use App\Models\ReminderType;
 use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
-use App\Models\RestaurantSchedule;
+use App\Models\Review;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -116,6 +116,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::patch('/reservation_statuses/{id}', 'update')->can('update', ReservationStatuse::class);
             Route::delete('/reservation_statuses/{id}', 'destroy')->can('delete', ReservationStatuse::class);
             Route::post('/reservation_statuses', 'store')->can('create', ReservationStatuse::class);
+        });
+
+        Route::controller(ReviewController::class)->group(function () {
+            Route::post('/restaurants/{id}/reviews', 'store')->can('create', Review::class);
         });
     });
 

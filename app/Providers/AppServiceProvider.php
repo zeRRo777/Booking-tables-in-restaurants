@@ -7,6 +7,7 @@ use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
 use App\Models\RestaurantSchedule;
+use App\Models\Review;
 use App\Models\Role;
 use App\Models\Table;
 use App\Models\User;
@@ -15,6 +16,7 @@ use App\Policies\ReminderTypePolicy;
 use App\Policies\ReservationStatusePolicy;
 use App\Policies\RestaurantPolicy;
 use App\Policies\RestaurantSchedulePolicy;
+use App\Policies\ReviewPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\TablePolicy;
 use App\Policies\UserPolicy;
@@ -112,5 +114,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ReminderType::class, ReminderTypePolicy::class);
         Gate::policy(ReservationStatuse::class, ReservationStatusePolicy::class);
         Gate::policy(RestaurantSchedule::class, RestaurantSchedulePolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
     }
 }

@@ -93,4 +93,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->roles()->whereIn('name', $roleNames)->exists();
     }
+
+    public function isBlocked(): bool
+    {
+        return $this->is_blocked;
+    }
 }

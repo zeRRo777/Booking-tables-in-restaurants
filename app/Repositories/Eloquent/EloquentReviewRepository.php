@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Review\CreateReviewDTO;
 use App\DTOs\Review\ReviewFilterDTO;
 use App\Models\Review;
 use App\Repositories\Contracts\ReviewRepositoryInterface;
@@ -27,5 +28,15 @@ class EloquentReviewRepository implements ReviewRepositoryInterface
     public function findById(int $id): Review|null
     {
         return Review::find($id);
+    }
+
+    public function create(CreateReviewDTO $dto): Review
+    {
+        return Review::create([
+            'description' => $dto->description,
+            'restaurant_id' => $dto->restaurant_id,
+            'user_id' => $dto->user_id,
+            'rating' => $dto->rating,
+        ]);
     }
 }

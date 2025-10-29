@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
-use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;

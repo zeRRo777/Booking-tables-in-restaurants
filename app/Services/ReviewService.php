@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\Review\CreateReviewDTO;
 use App\DTOs\Review\ReviewFilterDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Review;
@@ -26,6 +27,13 @@ class ReviewService
         if (!$review) {
             throw new NotFoundException('Отзыв не найден!');
         }
+
+        return $review->load(['restaurant.chain', 'user']);
+    }
+
+    public function createReview(CreateReviewDTO $dto): Review
+    {
+        $review = $this->reviewRepository->create($dto);
 
         return $review->load(['restaurant.chain', 'user']);
     }
