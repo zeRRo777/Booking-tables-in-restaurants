@@ -16,4 +16,13 @@ class ReviewPolicy
     {
         return $user->id === $review->user_id;
     }
+
+    public function delete(User $user, Review $review): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $user->id === $review->user_id;
+    }
 }

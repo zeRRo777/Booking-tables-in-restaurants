@@ -9,6 +9,7 @@ use App\Exceptions\NotFoundException;
 use App\Models\Review;
 use App\Repositories\Contracts\ReviewRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ReviewService
 {
@@ -53,5 +54,12 @@ class ReviewService
         $this->reviewRepository->update($review, $data);
 
         return $review->refresh()->load(['restaurant.chain', 'user']);
+    }
+
+    public function deleteReview(Review $review, bool $real = false): void
+    {
+        DB::transaction(function () use ($review, $real): void {
+            $this->reviewRepository->delete($review, $real);
+        });
     }
 }

@@ -44,4 +44,9 @@ class EloquentReviewRepository implements ReviewRepositoryInterface
     {
         return $review->update($data);
     }
+
+    public function delete(Review $review, bool $real = false): bool
+    {
+        return $real ? $review->forceDelete() : $review->delete();
+    }
 }

@@ -17,4 +17,6 @@ interface ReviewRepositoryInterface
     public function create(CreateReviewDTO $dto): Review;
 
     public function update(Review $review, array $data): bool;
+
+    public function delete(Review $review, bool $real = false): bool;
 }
