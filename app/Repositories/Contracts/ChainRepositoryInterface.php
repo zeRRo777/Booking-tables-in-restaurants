@@ -8,6 +8,7 @@ use App\Models\RestaurantChain;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 interface ChainRepositoryInterface
 {
@@ -20,4 +21,6 @@ interface ChainRepositoryInterface
     public function update(RestaurantChain $chain, array $data): bool;
 
     public function delete(RestaurantChain $chain, bool $real = false): bool;
+
+    public function getAllAdmins(RestaurantChain $chain): Collection;
 }

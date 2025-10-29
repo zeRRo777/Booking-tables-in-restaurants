@@ -8,6 +8,7 @@ use App\Http\Requests\Chain\StoreRequest;
 use App\Http\Requests\Chain\UpdateRequest;
 use App\Http\Resources\ChainCollection;
 use App\Http\Resources\ChainResourse;
+use App\Http\Resources\UserCollection;
 use App\Services\ChainService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
@@ -426,5 +427,77 @@ class ChainController extends Controller
         $this->chainService->deleteChain($id, true);
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/chains/{id}/admins",
+     * tags={"Chains"},
+     * summary="Получение списка админов сети ресторанов",
+     * description="Получение списка админов сети ресторанов",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID сети ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка админов сети ресторанов",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив админов сети ресторанов",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1/admins")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/chains/1/admins")
+     * )
+     * ),
+     * )
+     */
+    public function allAdmins(int $id): UserCollection
+    {
+        $chain = $this->chainService->getChain($id);
+
+        Gate::authorize('viewAdmin', $chain);
+
+        $admins = $this->chainService->getAdmins($chain);
+
+        return new UserCollection($admins);
     }
 }

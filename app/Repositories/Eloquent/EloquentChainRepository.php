@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class EloquentChainRepository implements ChainRepositoryInterface
 {
@@ -56,5 +57,10 @@ class EloquentChainRepository implements ChainRepositoryInterface
         $query->orderBy($dto->sort_by, $dto->sort_direction);
 
         return $query->paginate($dto->per_page);
+    }
+
+    public function getAllAdmins(RestaurantChain $chain): Collection
+    {
+        return $chain->superAdmins;
     }
 }

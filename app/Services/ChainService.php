@@ -10,6 +10,7 @@ use App\Models\RestaurantChain;
 use App\Models\User;
 use App\Repositories\Contracts\ChainRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -70,5 +71,10 @@ class ChainService
         DB::transaction(function () use ($chain, $real): bool {
             return $this->chainRepository->delete($chain, $real);
         });
+    }
+
+    public function getAdmins(RestaurantChain $chain): Collection
+    {
+        return $this->chainRepository->getAllAdmins($chain);
     }
 }

@@ -48,4 +48,13 @@ class ChainPolicy
 
         return false;
     }
+
+    public function viewAdmin(User $user, RestaurantChain $chain): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $chain->superAdmins()->where('user_id', $user->id)->exists();
+    }
 }

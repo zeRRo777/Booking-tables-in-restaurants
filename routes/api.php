@@ -80,6 +80,7 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/chains', 'store')->can('create', RestaurantChain::class);
             Route::patch('/chains/{id}', 'update');
             Route::delete('/chains/{id}', 'destroy')->can('delete', RestaurantChain::class);
+            Route::get('/chains/{id}/admins', 'allAdmins');
         });
 
         Route::controller(RestaurantController::class)->group(function () {
