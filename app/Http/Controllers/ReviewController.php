@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Review\IndexRequest;
 use App\Http\Requests\Review\StoreRequest;
+use App\Http\Requests\Review\UpdateRequest;
 use App\Http\Resources\ReviewCollection;
 use App\Http\Resources\ReviewResource;
 use App\Services\ReviewService;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @OA\Tag(
@@ -327,5 +328,117 @@ class ReviewController extends Controller
         $review = $this->reviewService->createReview($dto);
 
         return new ReviewResource($review);
+    }
+
+    /**
+     * @OA\Patch(
+     * path="/reviews/{id}",
+     * tags={"Reviews"},
+     * summary="Изменение отзыва",
+     * description="Изменение отзыва",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID отзыва",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * description="Данные для измененения",
+     * @OA\JsonContent(
+     * @OA\Property(property="description", type="string", example="Update description"),
+     * @OA\Property(property="rating", type="integer", example="5"),
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное изменение отзыва",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="object",
+     * description="Объект отзыва",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Тестовый отзыв"),
+     * @OA\Property(
+     *   property="user",
+     *   type="object",
+     *   description="Автор отзыва",
+     *   @OA\Property(property="id", type="integer", example=1),
+     *   @OA\Property(property="name", type="string", example="Вася")
+     * ),
+     * @OA\Property(property="rating", type="integer", example=4),
+     * @OA\Property(
+     *   property="restaurant",
+     *   type="object",
+     *   description="Ресторан, к которому относится отзыв",
+     *   @OA\Property(property="id", type="integer", example=1),
+     *   @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     *   @OA\Property(property="address", type="string", example="Тестовый address"),
+     *   @OA\Property(property="type_kitchen", type="string", example="Тестовый type_kitchen"),
+     *   @OA\Property(
+     *     property="chain",
+     *     type="object",
+     *     description="Сеть ресторанов",
+     *     @OA\Property(property="id", type="integer", example=1),
+     *     @OA\Property(property="name", type="string", example="Тестовая сеть")
+     *   )
+     * )
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/reviews/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Доступ запрещен (нет прав)",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="Forbidden"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/reviews/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/reviews/1"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле name обязательно для заполнения."))),
+     * )
+     * ),
+     * )
+     */
+    public function update(UpdateRequest $request, int $id): ReviewResource
+    {
+        $review = $this->reviewService->getReview($id);
+
+        Gate::authorize('update', $review);
+
+        $dto = $request->toDto();
+
+        $updateReview = $this->reviewService->updateReview($review, $dto);
+
+        return new ReviewResource($updateReview);
     }
 }

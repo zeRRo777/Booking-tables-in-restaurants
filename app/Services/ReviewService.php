@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTOs\Review\CreateReviewDTO;
 use App\DTOs\Review\ReviewFilterDTO;
+use App\DTOs\Review\UpdateReviewDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\Review;
 use App\Repositories\Contracts\ReviewRepositoryInterface;
@@ -36,5 +37,21 @@ class ReviewService
         $review = $this->reviewRepository->create($dto);
 
         return $review->load(['restaurant.chain', 'user']);
+    }
+
+    public function updateReview(Review $review, UpdateReviewDTO $dto): Review
+    {
+        $data = array_filter(
+            $dto->toArray(),
+            fn($value) => !is_null($value)
+        );
+
+        if (empty($data)) {
+            return $review;
+        }
+
+        $this->reviewRepository->update($review, $data);
+
+        return $review->refresh()->load(['restaurant.chain', 'user']);
     }
 }

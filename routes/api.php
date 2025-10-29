@@ -120,6 +120,7 @@ Route::middleware('throttle:api')->group(function (): void {
 
         Route::controller(ReviewController::class)->group(function () {
             Route::post('/restaurants/{id}/reviews', 'store')->can('create', Review::class);
+            Route::patch('/reviews/{id}', 'update');
         });
     });
 

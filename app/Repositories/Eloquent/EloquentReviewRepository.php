@@ -39,4 +39,9 @@ class EloquentReviewRepository implements ReviewRepositoryInterface
             'rating' => $dto->rating,
         ]);
     }
+
+    public function update(Review $review, array $data): bool
+    {
+        return $review->update($data);
+    }
 }
