@@ -10,21 +10,27 @@ use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\DTOs\Restaurant\UpdateRestaurantScheduleDTO;
+use App\DTOs\User\CreateUserDTO;
 use App\Exceptions\NotFoundException;
+use App\Exceptions\UserNotHaveRoleException;
 use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
 use App\Models\RestaurantStatuse;
 use App\Models\User;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
+use App\Repositories\Contracts\RoleRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class RestaurantService
 {
     public function __construct(
         protected RestaurantRepositoryInterface $restaurantRepository,
-        protected RestaurantScheduleRepositoryInterface $restaurantScheduleRepository
+        protected RestaurantScheduleRepositoryInterface $restaurantScheduleRepository,
+        protected UserService $userService,
+        protected RoleRepositoryInterface $roleRepository,
     ) {}
 
     public function getRestaurants(RestaurantFilterDTO $dto, ?User $user): LengthAwarePaginator
@@ -161,6 +167,36 @@ class RestaurantService
     {
         DB::transaction(function () use ($schedule, $real): void {
             $this->restaurantScheduleRepository->delete($schedule, $real);
+        });
+    }
+
+    public function getAdmins(Restaurant $restaurant): Collection
+    {
+        return $this->restaurantRepository->getAllAdmins($restaurant);
+    }
+
+    public function addAdmin(CreateUserDTO $dto, Restaurant $restaurant): void
+    {
+        DB::transaction(function () use ($dto, $restaurant) {
+            $user = $this->userService->createUser($dto);
+            $role = $this->roleRepository->findByName('restaurant_admin');
+            $restaurant->administrators()->attach($user->id);
+            if ($role) {
+                $user->roles()->attach($role->id);
+            }
+        });
+    }
+
+    public function removeAdmin(User $user, Restaurant $restaurant): void
+    {
+        DB::transaction(function () use ($user, $restaurant) {
+            $restaurant->administrators()->detach($user->id);
+            if ($user->administeredRestaurants()->count() === 0) {
+                $role = $this->roleRepository->findByName('restaurant_admin');
+                if ($role) {
+                    $user->roles()->detach($role->id);
+                }
+            }
         });
     }
 }

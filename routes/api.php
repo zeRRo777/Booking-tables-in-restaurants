@@ -93,6 +93,9 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/restaurants/{id}/schedules', 'restaurantScheduleStore');
             Route::patch('/restaurants/{id}/schedules/{date}', 'restaurantScheduleUpdate');
             Route::delete('/restaurants/{id}/schedules/{date}', 'restaurantScheduleDestroy');
+            Route::get('/restaurants/{id}/admins', 'allAdmins');
+            Route::post('/restaurants/{id}/admins', 'storeAdmin');
+            Route::delete('/restaurants/{restaurant_id}/admins/{user_id}', 'destroyAdmin');
         });
 
         Route::controller(TableController::class)->group(function () {

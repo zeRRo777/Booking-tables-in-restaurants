@@ -7,6 +7,7 @@ use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\Models\Restaurant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 interface RestaurantRepositoryInterface
 {
@@ -19,4 +20,6 @@ interface RestaurantRepositoryInterface
     public function update(Restaurant $restaurant, array $data): bool;
 
     public function delete(Restaurant $restaurant, bool $real = false): bool;
+
+    public function getAllAdmins(Restaurant $restaurant): Collection;
 }

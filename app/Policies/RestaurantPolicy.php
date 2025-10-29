@@ -73,4 +73,35 @@ class RestaurantPolicy
     {
         return $user->hasRole('superadmin');
     }
+
+    public function viewAdmins(User $user, Restaurant $restaurant): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $restaurant->chain()->superAdmins()->where('user_id', $user->id)->exists();
+    }
+
+    public function addAdmin(User $user, Restaurant $restaurant): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return $restaurant->chain()->superAdmins()->where('user_id', $user->id)->exists();
+    }
+
+    public function removeAdmin(User $user, Restaurant $restaurant, User $model): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        if ($restaurant->chain()->superAdmins()->where('user_id', $user->id)->exists() && $restaurant->administrators()->where('user_id', $model->id)->exists()) {
+            return true;
+        }
+
+        return false;
+    }
 }

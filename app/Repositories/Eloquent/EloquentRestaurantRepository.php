@@ -9,6 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantStatuse;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class EloquentRestaurantRepository implements RestaurantRepositoryInterface
 {
@@ -81,5 +82,10 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
     public function delete(Restaurant $restaurant, bool $real = false): bool
     {
         return $real ? $restaurant->forceDelete() : $restaurant->delete();
+    }
+
+    public function getAllAdmins(Restaurant $restaurant): Collection
+    {
+        return $restaurant->administrators;
     }
 }

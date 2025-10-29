@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\Exceptions\NotFoundException;
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\Schedules\DeleteRequest;
@@ -17,8 +18,10 @@ use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Http\Resources\RestaurantScheduleCollection;
 use App\Http\Resources\RestaurantScheduleResource;
+use App\Http\Resources\UserCollection;
 use App\Models\RestaurantSchedule;
 use App\Services\RestaurantService;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
@@ -37,7 +40,8 @@ use Illuminate\Support\Facades\Gate;
 class RestaurantController extends Controller
 {
     public function __construct(
-        protected RestaurantService $restaurantService
+        protected RestaurantService $restaurantService,
+        protected UserService $userService
     ) {}
 
     /**
@@ -1253,6 +1257,239 @@ class RestaurantController extends Controller
         $schedule = $this->restaurantService->getSchedule($dto);
 
         $this->restaurantService->deleteSchedule($schedule, true);
+
+        return response()->json(null, 204);
+    }
+
+
+    /**
+     * @OA\Get(
+     * path="/restaurants/{id}/admins",
+     * tags={"Restaurants"},
+     * summary="Получение списка админов ресторана",
+     * description="Получение списка админов ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка админов ресторана",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив админов ресторана",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Ресторан не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="Object not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Ресторан не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins")
+     * )
+     * ),
+     * )
+     */
+    public function allAdmins(int $id): UserCollection
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('viewAdmins', $restaurant);
+
+        $admins = $this->restaurantService->getAdmins($restaurant);
+
+        return new UserCollection($admins);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/restaurants/{id}/admins",
+     * tags={"Restaurants"},
+     * summary="Добавление нового админа ресторана",
+     * description="Добавление нового админа ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"email", "password", "password_confirmation", "name", "phone"},
+     * @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     * @OA\Property(property="password", type="string", format="password", example="password123"),
+     * @OA\Property(property="password_confirmation", type="string", format="password", example="password123"),
+     * @OA\Property(property="name", type="string", example="Джон Доу"),
+     * @OA\Property(property="phone", type="string", example="+89123456789")
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно добавлен и сделал админом ресторана",
+     * ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/api/users"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins")
+     * )
+     * ),
+     * )
+     */
+    public function storeAdmin(RegisterUserRequest $request, int $id): JsonResponse
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('addAdmin', $restaurant);
+
+        $dto = $request->toDTO();
+
+        $this->restaurantService->addAdmin($dto, $restaurant);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/restaurants/{restaurant_id}/admins/{user_id}",
+     * tags={"Restaurants"},
+     * summary="Удаление админа ресторана",
+     * description="Удаление админа ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="restaurant_id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="user_id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=201,
+     * description="Админ успешно удален",
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=404,
+     * description="Пользователь не найден",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/user-not-found"),
+     * @OA\Property(property="title", type="string", example="User not Found"),
+     * @OA\Property(property="status", type="integer", example=404),
+     * @OA\Property(property="detail", type="string", example="Пользователь не найден!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=500,
+     * description="Внутрення ошибка сервера",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/database-error"),
+     * @OA\Property(property="title", type="string", example="Database Error"),
+     * @OA\Property(property="status", type="string", example="500"),
+     * @OA\Property(property="detail", type="string", example="Произошла ошибка базы данных!"),
+     * @OA\Property(property="instance", type="string", example="/api/restaurants/1/admins/1"),
+     * )
+     * ),
+     * )
+     */
+    public function destroyAdmin(int $restaurant_id, int $user_id): JsonResponse
+    {
+        $restaurant = $this->restaurantService->getRestaurant($restaurant_id);
+        $user = $this->userService->getUser($user_id);
+
+        Gate::authorize('removeAdmin', [$restaurant, $user]);
+
+        $this->restaurantService->removeAdmin($user, $restaurant);
 
         return response()->json(null, 204);
     }
