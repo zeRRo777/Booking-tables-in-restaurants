@@ -23,4 +23,9 @@ class EloquentReviewRepository implements ReviewRepositoryInterface
 
         return $query->with(['restaurant.chain', 'user'])->paginate($dto->per_page);
     }
+
+    public function findById(int $id): Review|null
+    {
+        return Review::find($id);
+    }
 }

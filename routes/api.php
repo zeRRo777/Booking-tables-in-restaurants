@@ -121,6 +121,7 @@ Route::middleware('throttle:api')->group(function (): void {
 
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/restaurants/{id}/reviews', 'index');
+        Route::get('/reviews/{id}', 'show');
     });
 
     Route::post('/auth/email/change/confirm', [AuthController::class, 'changeEmail']);
