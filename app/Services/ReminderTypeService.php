@@ -7,14 +7,14 @@ use App\DTOs\ReminderType\ReminderTypeFilterDTO;
 use App\DTOs\ReminderType\UpdateReminderTypeDTO;
 use App\Exceptions\NotFoundException;
 use App\Models\ReminderType;
-use App\Repositories\Contracts\ReminderTypeInterface;
+use App\Repositories\Contracts\ReminderTypeRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class ReminderTypeService
 {
     public function __construct(
-        protected ReminderTypeInterface $reminderTypeRepository
+        protected ReminderTypeRepositoryInterface $reminderTypeRepository
     ) {}
 
     public function getAll(ReminderTypeFilterDTO $dto): LengthAwarePaginator

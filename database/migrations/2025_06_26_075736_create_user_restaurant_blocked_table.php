@@ -13,10 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_restaurant_statuses', function (Blueprint $table) {
+        Schema::create('user_restaurant_blocked', function (Blueprint $table) {
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Restaurant::class)->constrained()->cascadeOnDelete();
-            $table->boolean('is_blocked')->default(false);
             $table->text('block_reason');
             $table->foreignId('blocked_by')->constrained('users', 'id')->nullOnDelete();
             $table->timestamps();

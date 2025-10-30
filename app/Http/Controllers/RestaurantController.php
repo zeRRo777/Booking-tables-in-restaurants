@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
 use App\Exceptions\NotFoundException;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Restaurant\Blocked\DeleteRequest as BlockedDeleteRequest;
+use App\Http\Requests\Restaurant\Blocked\IndexRequest as BlockedIndexRequest;
+use App\Http\Requests\Restaurant\Blocked\StoreRequest as BlockedStoreRequest;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\Schedules\DeleteRequest;
@@ -14,11 +17,14 @@ use App\Http\Requests\Restaurant\Schedules\StoreRequest as SchedulesStoreRequest
 use App\Http\Requests\Restaurant\Schedules\UpdateRequest as SchedulesUpdateRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Requests\Restaurant\UpdateRequest;
+use App\Http\Resources\BlockedUserCollection;
+use App\Http\Resources\BlockedUserResource;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Http\Resources\RestaurantScheduleCollection;
 use App\Http\Resources\RestaurantScheduleResource;
 use App\Http\Resources\UserCollection;
+use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
 use App\Services\RestaurantService;
 use App\Services\UserService;
@@ -1490,6 +1496,339 @@ class RestaurantController extends Controller
         Gate::authorize('removeAdmin', [$restaurant, $user]);
 
         $this->restaurantService->removeAdmin($user, $restaurant);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\GET(
+     * path="/restaurants/{id}/blocked-users",
+     * tags={"Restaurants"},
+     * summary="Получение списка заблокированных пользователей ресторана",
+     * description="Получение списка заблокированных пользователей ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="name",
+     * in="query",
+     * description="Поиск по имени",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="email",
+     * in="query",
+     * description="Поиск по email",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="phone",
+     * in="query",
+     * description="Поиск по phone",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"id", "name", "email", "phone", "created_at"},
+     * default="id"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка пользователей",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив пользователей",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="NAME"),
+     * @OA\Property(property="email", type="string", example="email"),
+     * @OA\Property(property="phone", type="string", example="phone"),
+     * @OA\Property(
+     * property="block_info",
+     * type="object",
+     * description="Информация о блокировке",
+     * @OA\Property(property="blocked_reason", type="string", example="blocked_reason"),
+     * @OA\Property(property="blocked_at", type="string", example="28.02.2001 12:12:12"),
+     * @OA\Property(
+     * property="blocked_by",
+     * type="object",
+     * description="Информация о пользователе, который заблокировал пользователя",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users")
+     * )
+     * ),
+     * )
+     */
+    public function blockedUsers(BlockedIndexRequest $request, int $id): BlockedUserCollection
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('viewBlockedUsers', $restaurant);
+
+        $dto = $request->toDto();
+
+        $users = $this->restaurantService->getBlockedUsers($dto);
+
+        return new BlockedUserCollection($users);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/restaurants/{id}/blocked-users",
+     * tags={"Restaurants"},
+     * summary="Добавление заблокированного в ресторане пользователя",
+     * description="Добавление заблокированного в ресторане пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"user_id"},
+     * @OA\Property(property="user_id", type="integer", example="1"),
+     * @OA\Property(property="block_reason", type="integer", example="тестовая причина"),
+     * )
+     * ),
+     * @OA\Response(
+     *         response=200,
+     *         description="Успешное добавление блокировки пользователю",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 description="Объект заблокированного пользователя",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="NAME"),
+     *                 @OA\Property(property="email", type="string", example="email"),
+     *                 @OA\Property(property="phone", type="string", example="phone"),
+     *                 @OA\Property(
+     * property="block_info",
+     * type="object",
+     * description="Информация о блокировке",
+     * @OA\Property(property="blocked_reason", type="string", example="blocked_reason"),
+     * @OA\Property(property="blocked_at", type="string", example="28.02.2001 12:12:12"),
+     * @OA\Property(
+     * property="blocked_by",
+     * type="object",
+     * description="Информация о пользователе, который заблокировал пользователя",
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="name", type="string", example="Илларион Иванович Шарапов"),
+     * @OA\Property(property="email", type="string", example="admin@admin.com"),
+     * @OA\Property(property="phone", type="string", example="+590432015354"),
+     * @OA\Property(property="is_blocked", type="boolean", example=false),
+     * @OA\Property(property="created_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * @OA\Property(property="updated_at", type="string", format="date-time", example="13.10.2025 16:58:09"),
+     * ),
+     * ),
+     *             )
+     *         )
+     *     ),
+     * @OA\Response(
+     * response=422,
+     * description="Ошибка валидации",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/validation-error"),
+     * @OA\Property(property="title", type="string", example="Validation Error"),
+     * @OA\Property(property="status", type="integer", example=422),
+     * @OA\Property(property="detail", type="string", example="Произошла одна или несколько ошибок проверки."),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users"),
+     * @OA\Property(property="errors", type="object",
+     * @OA\Property(property="email", type="array", @OA\Items(type="string", example="Поле email обязательно для заполнения."))),
+     * )
+     * ),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users")
+     * )
+     * ),
+     * )
+     */
+    public function addBlockedUser(BlockedStoreRequest $request, int $id): BlockedUserResource
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('addBlockedUser', $restaurant);
+
+        $dto = $request->toDto();
+
+        $user = $this->restaurantService->addBlockedUser($dto);
+
+        return new BlockedUserResource($user);
+    }
+
+    /**
+     * @OA\Delete(
+     * path="/restaurants/{restaurant_id}/blocked-users/{user_id}",
+     * tags={"Restaurants"},
+     * summary="Разблокировка пользователя ресторана",
+     * description="Разблокировка пользователя ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="user_id",
+     * in="path",
+     * description="ID пользователя",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="restaurant_id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Response(
+     * response=204,
+     * description="Пользователь успешно разблокирован",
+     *),
+     * @OA\Response(
+     * response=401,
+     * description="Вы не авторизованы",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/unauthorized"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=401),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу доступен только авторизованным пользователям!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users/1")
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/blocked-users/1")
+     * )
+     * ),
+     * )
+     */
+    public function deleteBlockedUser(BlockedDeleteRequest $request, int $restaurant_id, int $user_id): JsonResponse
+    {
+        $restaurant = $this->restaurantService->getRestaurant($restaurant_id);
+
+        Gate::authorize('deleteBlockedUser', $restaurant);
+
+        $dto = $request->toDto();
+
+        $this->restaurantService->deleteBlockedUser($dto, true);
 
         return response()->json(null, 204);
     }

@@ -5,10 +5,10 @@ namespace App\Repositories\Eloquent;
 use App\DTOs\ReminderType\CreateReminderTypeDTO;
 use App\DTOs\ReminderType\ReminderTypeFilterDTO;
 use App\Models\ReminderType;
-use App\Repositories\Contracts\ReminderTypeInterface;
+use App\Repositories\Contracts\ReminderTypeRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class EloquentReminderTypeRepository implements ReminderTypeInterface
+class EloquentReminderTypeRepository implements ReminderTypeRepositoryInterface
 {
     public function getAll(ReminderTypeFilterDTO $dto): LengthAwarePaginator
     {

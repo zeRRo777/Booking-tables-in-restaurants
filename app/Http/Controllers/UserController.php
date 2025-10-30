@@ -766,7 +766,7 @@ class UserController extends Controller
      * example=1
      * )
      * ),
-     * * @OA\Parameter(
+     * @OA\Parameter(
      * name="role_id",
      * in="path",
      * description="ID роли",

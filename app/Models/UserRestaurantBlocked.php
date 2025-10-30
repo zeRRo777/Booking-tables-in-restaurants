@@ -6,24 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserRestaurantStatuse extends Model
+class UserRestaurantBlocked extends Model
 {
     use SoftDeletes;
 
     protected $primaryKey = ['user_id', 'restaurant_id'];
+    protected $table = 'user_restaurant_blocked';
 
     public $incrementing = false;
 
     protected $fillable = [
         'user_id',
         'restaurant_id',
-        'is_blocked',
         'block_reason',
         'blocked_by'
-    ];
-
-    protected $casts = [
-        'is_blocked' => 'boolean'
     ];
 
     public function user(): BelongsTo

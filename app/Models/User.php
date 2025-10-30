@@ -54,9 +54,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Reservation::class);
     }
 
-    public function statuses(): HasMany
+    public function restaurants_blocked(): HasMany
     {
-        return $this->hasMany(UserRestaurantStatuse::class);
+        return $this->hasMany(UserRestaurantBlocked::class);
     }
 
     public function administeredRestaurants(): BelongsToMany
@@ -76,7 +76,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function blockedUsers(): HasMany
     {
-        return $this->hasMany(UserRestaurantStatuse::class, 'blocked_by');
+        return $this->hasMany(UserRestaurantBlocked::class, 'blocked_by');
     }
 
     public function hasVerifiedPhone(): bool

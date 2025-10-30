@@ -57,9 +57,9 @@ class Restaurant extends Model
         return $this->hasMany(Table::class);
     }
 
-    public function usersStatuses(): HasMany
+    public function usersBlocked(): HasMany
     {
-        return $this->hasMany(UserRestaurantStatuse::class);
+        return $this->hasMany(UserRestaurantBlocked::class);
     }
 
     public function chain(): BelongsTo

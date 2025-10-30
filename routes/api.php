@@ -96,6 +96,9 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/restaurants/{id}/admins', 'allAdmins');
             Route::post('/restaurants/{id}/admins', 'storeAdmin');
             Route::delete('/restaurants/{restaurant_id}/admins/{user_id}', 'destroyAdmin');
+            Route::get('/restaurants/{id}/blocked-users', 'blockedUsers');
+            Route::post('/restaurants/{id}/blocked-users', 'addBlockedUser');
+            Route::delete('/restaurants/{restaurant_id}/blocked-users/{user_id}', 'deleteBlockedUser');
         });
 
         Route::controller(TableController::class)->group(function () {

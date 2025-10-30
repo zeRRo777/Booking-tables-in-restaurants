@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Restaurant\Blocked;
 
-use App\DTOs\User\UserFilterDTO;
+use App\DTOs\Restaurant\BlockedUserFilterDTO;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,9 +27,9 @@ class IndexRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:100'],
             'email' => ['sometimes', 'string', 'max:50'],
             'phone' => ['sometimes', 'string', 'max:20'],
-            'is_blocked' => ['sometimes', 'in:true,false'],
+            'restaurant_id' => ['required', 'integer', 'exists:restaurants,id'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name', 'email', 'phone', 'created_at', 'is_blocked'])],
+            'sort_by' => ['sometimes', 'string', Rule::in(['id', 'name', 'email', 'phone', 'created_at'])],
             'sort_direction' => ['sometimes', 'string', Rule::in(['asc', 'desc'])],
         ];
     }
@@ -40,38 +40,21 @@ class IndexRequest extends FormRequest
             'name' => 'Имя',
             'email' => 'Почта',
             'phone' => 'Телефон',
-            'is_blocked' => 'Заблокирован',
             'per_page' => 'Количество пользователей на странице',
             'sort_by' => 'Поле сортировки',
             'sort_direction' => 'Направление сортировки',
         ];
     }
 
-    public function toDto(): UserFilterDTO
+    public function toDto(): BlockedUserFilterDTO
     {
-        return UserFilterDTO::from($this->validated());
+        return BlockedUserFilterDTO::from($this->validated());
     }
 
-    /**
-     * Get the validated data from the request.
-     * @param string|null $key
-     * @param mixed $default
-     * @return array<string, mixed>
-     */
-    public function validated($key = null, $default = null): array
+    public function prepareForValidation(): void
     {
-        $validated = parent::validated();
-
-        if (array_key_exists('is_blocked', $validated)) {
-            $value = $validated['is_blocked'];
-
-            $validated['is_blocked'] = filter_var(
-                $value,
-                FILTER_VALIDATE_BOOLEAN,
-                FILTER_NULL_ON_FAILURE
-            );
-        }
-
-        return $validated;
+        $this->merge([
+            'restaurant_id' => $this->route('id'),
+        ]);
     }
 }

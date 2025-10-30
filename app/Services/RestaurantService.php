@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use App\DTOs\Restaurant\BlockedUserFilterDTO;
 use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\DTOs\Restaurant\CreateRestaurantScheduleDTO;
+use App\DTOs\Restaurant\CreateUserRestaurantBlockedDTO;
+use App\DTOs\Restaurant\CreateUserRestaurantStatusDTO;
+use App\DTOs\Restaurant\DeleteUserRestaurantBlockedDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
@@ -17,9 +21,12 @@ use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
 use App\Models\RestaurantStatuse;
 use App\Models\User;
+use App\Models\UserRestaurantBlocked;
+use App\Models\UserRestaurantStatuse;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
+use App\Repositories\Contracts\UserRestaurantStatuseRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +38,7 @@ class RestaurantService
         protected RestaurantScheduleRepositoryInterface $restaurantScheduleRepository,
         protected UserService $userService,
         protected RoleRepositoryInterface $roleRepository,
+        protected UserRestaurantStatuseRepositoryInterface $userRestaurantStatuseRepository
     ) {}
 
     public function getRestaurants(RestaurantFilterDTO $dto, ?User $user): LengthAwarePaginator
@@ -198,5 +206,22 @@ class RestaurantService
                 }
             }
         });
+    }
+
+    public function getBlockedUsers(BlockedUserFilterDTO $dto): LengthAwarePaginator
+    {
+        return $this->userRestaurantStatuseRepository->getBlockedUsersforRestaurant($dto);
+    }
+
+    public function addBlockedUser(CreateUserRestaurantBlockedDTO $dto): UserRestaurantBlocked
+    {
+        $blockedUser = $this->userRestaurantStatuseRepository->create($dto);
+
+        return $blockedUser->load(['user', 'blocker', 'restaurant']);
+    }
+
+    public function deleteBlockedUser(DeleteUserRestaurantBlockedDTO $dto, bool $real = false): void
+    {
+        $this->userRestaurantStatuseRepository->delete($dto, $real);
     }
 }

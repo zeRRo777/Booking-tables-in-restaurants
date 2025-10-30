@@ -7,7 +7,7 @@ use App\DTOs\ReminderType\ReminderTypeFilterDTO;
 use App\Models\ReminderType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-interface ReminderTypeInterface
+interface ReminderTypeRepositoryInterface
 {
     public function getAll(ReminderTypeFilterDTO $dto): LengthAwarePaginator;
 

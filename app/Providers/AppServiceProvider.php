@@ -26,7 +26,7 @@ use App\Repositories\Contracts\EmailVefiedRepositoryInterface;
 use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
-use App\Repositories\Contracts\ReminderTypeInterface;
+use App\Repositories\Contracts\ReminderTypeRepositoryInterface;
 use App\Repositories\Contracts\ReservationStatuseRepositoryInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
@@ -34,6 +34,7 @@ use App\Repositories\Contracts\ReviewRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\TableRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Contracts\UserRestaurantStatuseRepositoryInterface;
 use App\Repositories\Contracts\UserTokensRepositoryInterface;
 use App\Repositories\Eloquent\EloquentChainRepository;
 use App\Repositories\Eloquent\EloquentEmailChangeRepository;
@@ -49,6 +50,7 @@ use App\Repositories\Eloquent\EloquentReviewRepository;
 use App\Repositories\Eloquent\EloquentRoleRepository;
 use App\Repositories\Eloquent\EloquentTableRepository;
 use App\Repositories\Eloquent\EloquentUserRepository;
+use App\Repositories\Eloquent\EloquentUserRestaurantStatuseRepository;
 use App\Repositories\Eloquent\EloquentUserTokensRepository;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
@@ -75,10 +77,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChainRepositoryInterface::class, EloquentChainRepository::class);
         $this->app->bind(RestaurantRepositoryInterface::class, EloquentRestaurantRepository::class);
         $this->app->bind(TableRepositoryInterface::class, EloquentTableRepository::class);
-        $this->app->bind(ReminderTypeInterface::class, EloquentReminderTypeRepository::class);
+        $this->app->bind(ReminderTypeRepositoryInterface::class, EloquentReminderTypeRepository::class);
         $this->app->bind(ReservationStatuseRepositoryInterface::class, EloquentReservationStatuseRepository::class);
         $this->app->bind(RestaurantScheduleRepositoryInterface::class, EloquentRestaurantScheduleRepository::class);
         $this->app->bind(ReviewRepositoryInterface::class, EloquentReviewRepository::class);
+        $this->app->bind(UserRestaurantStatuseRepositoryInterface::class, EloquentUserRestaurantStatuseRepository::class);
     }
 
     /**
