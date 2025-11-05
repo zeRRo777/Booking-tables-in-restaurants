@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainController;
 use App\Http\Controllers\ReminderTypeController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationStatuseController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\ReviewController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\VerifyController;
 use App\Http\Middleware\GuestMiddleware;
 use App\Http\Middleware\ValidateTokenInDatabase;
 use App\Models\ReminderType;
+use App\Models\Reservation;
 use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
@@ -129,6 +131,10 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::post('/restaurants/{id}/reviews', 'store')->can('create', Review::class);
             Route::patch('/reviews/{id}', 'update');
             Route::delete('/reviews/{id}', 'destroy');
+        });
+
+        Route::controller(ReservationController::class)->group(function () {
+            Route::post('/reservations', 'store')->can('create', Reservation::class);
         });
     });
 

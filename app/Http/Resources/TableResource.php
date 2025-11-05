@@ -27,7 +27,6 @@ class TableResource extends JsonResource
                 ];
             }),
             'created_at' => $this->created_at->format('d.m.Y H:i:s'),
-            'updated_at' => $this->updated_at->format('d.m.Y H:i:s'),
         ];
     }
 }

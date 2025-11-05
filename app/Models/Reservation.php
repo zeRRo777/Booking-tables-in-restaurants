@@ -24,8 +24,8 @@ class Reservation extends Model
     ];
 
     protected $casts = [
-        'date_start' => 'datetime',
-        'date_end' => 'datetime'
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime'
     ];
 
     public function user(): BelongsTo

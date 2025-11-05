@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\ReminderType;
+use App\Models\Reservation;
 use App\Models\ReservationStatuse;
 use App\Models\Restaurant;
 use App\Models\RestaurantChain;
@@ -13,6 +14,7 @@ use App\Models\Table;
 use App\Models\User;
 use App\Policies\ChainPolicy;
 use App\Policies\ReminderTypePolicy;
+use App\Policies\ReservationPolicy;
 use App\Policies\ReservationStatusePolicy;
 use App\Policies\RestaurantPolicy;
 use App\Policies\RestaurantSchedulePolicy;
@@ -27,6 +29,7 @@ use App\Repositories\Contracts\PasswordResetRepositoryInterface;
 use App\Repositories\Contracts\PhoneChangeRepositoryInterface;
 use App\Repositories\Contracts\PhoneVefiedRepositoryInterface;
 use App\Repositories\Contracts\ReminderTypeRepositoryInterface;
+use App\Repositories\Contracts\ReservationRepositoryInterface;
 use App\Repositories\Contracts\ReservationStatuseRepositoryInterface;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
@@ -43,6 +46,7 @@ use App\Repositories\Eloquent\EloquentPasswordResetRepository;
 use App\Repositories\Eloquent\EloquentPhoneChangeRepository;
 use App\Repositories\Eloquent\EloquentPhoneVerifiedRepository;
 use App\Repositories\Eloquent\EloquentReminderTypeRepository;
+use App\Repositories\Eloquent\EloquentReservationRepository;
 use App\Repositories\Eloquent\EloquentReservationStatuseRepository;
 use App\Repositories\Eloquent\EloquentRestaurantRepository;
 use App\Repositories\Eloquent\EloquentRestaurantScheduleRepository;
@@ -82,6 +86,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RestaurantScheduleRepositoryInterface::class, EloquentRestaurantScheduleRepository::class);
         $this->app->bind(ReviewRepositoryInterface::class, EloquentReviewRepository::class);
         $this->app->bind(UserRestaurantStatuseRepositoryInterface::class, EloquentUserRestaurantStatuseRepository::class);
+        $this->app->bind(ReservationRepositoryInterface::class, EloquentReservationRepository::class);
     }
 
     /**
@@ -118,5 +123,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ReservationStatuse::class, ReservationStatusePolicy::class);
         Gate::policy(RestaurantSchedule::class, RestaurantSchedulePolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
+        Gate::policy(Reservation::class, ReservationPolicy::class);
     }
 }
