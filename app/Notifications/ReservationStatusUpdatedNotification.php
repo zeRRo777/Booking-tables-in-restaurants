@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SuccessReservationNotification extends Notification implements ShouldQueue
+class ReservationStatusUpdatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -37,17 +37,13 @@ class SuccessReservationNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $status = $this->reservation->status->name;
+
         return (new MailMessage)
             ->greeting('Здравствуйте!')
-            ->subject('Уведомление об успешном бронировании столика в ресторане')
-            ->line('Вы успешно забронировали столик в ресторане ' . $this->reservation->restaurant->name)
-            ->line('Ваш номер столика: ' . $this->reservation->table->number)
-            ->line(
-                'Столик забронирован с ' . $this->reservation->starts_at->format('d.m.Y H:i')
-                    . ' по '
-                    . $this->reservation->ends_at->format('d.m.Y H:i')
-            )
-            ->line('Спасибо, что пользуетесь нашим сервисом!');
+            ->subject("Статус вашего бронирования изменен")
+            ->line("Статус вашего бронирования #{$this->reservation->id} в ресторане \"{$this->reservation->restaurant->name}\" был изменен.")
+            ->line("Новый статус: **{$status}**.");
     }
 
     /**

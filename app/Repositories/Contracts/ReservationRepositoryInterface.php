@@ -8,4 +8,8 @@ use App\Models\Reservation;
 interface ReservationRepositoryInterface
 {
     public function create(CreateReservationDTO $dto): Reservation;
+
+    public function getById(int $id): ?Reservation;
+
+    public function update(Reservation $reservation, array $data): bool;
 }

@@ -50,7 +50,6 @@ class StoreRequest extends FormRequest
             ],
             'ends_at' => [
                 'required',
-                'string',
                 'date_format:d.m.Y H:i',
                 new MinReservationTime()
             ],
@@ -80,7 +79,7 @@ class StoreRequest extends FormRequest
                 'integer',
                 Rule::exists('tables', 'id')->where('restaurant_id', $this->input('restaurant_id')),
                 new TableCapacity(),
-                new TableIsAvailable(),
+                new TableIsAvailable(null),
             ],
         ];
     }

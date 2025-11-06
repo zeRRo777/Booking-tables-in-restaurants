@@ -3194,6 +3194,10 @@
                                                         }
                                                     },
                                                     "type": "object"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "Pending"
                                                 }
                                             },
                                             "type": "object"
@@ -3273,6 +3277,297 @@
                                         "instance": {
                                             "type": "string",
                                             "example": "/api/reservations"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}": {
+            "patch": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Изменение бронирования",
+                "description": "Изменение бронирования",
+                "operationId": "5dc7053c7e4f6054410396cba0700421",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID бронирования",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "special_wish": {
+                                        "type": "string",
+                                        "example": "New special_wish"
+                                    },
+                                    "starts_at": {
+                                        "type": "string",
+                                        "example": "28.02.2026 18:00"
+                                    },
+                                    "ends_at": {
+                                        "type": "string",
+                                        "example": "28.02.2026 20:00"
+                                    },
+                                    "count_people": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "reminder_type_id": {
+                                        "type": "string",
+                                        "example": "1d"
+                                    },
+                                    "table_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "status_id": {
+                                        "type": "string",
+                                        "example": "Confirmed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Бронь столика изменена",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Объект Броинрования",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "start_at": {
+                                                    "type": "string",
+                                                    "example": "28.02.2026 18:00"
+                                                },
+                                                "ends_at": {
+                                                    "type": "string",
+                                                    "example": "28.02.2026 20:00"
+                                                },
+                                                "special_wish": {
+                                                    "type": "string",
+                                                    "example": "special_wish"
+                                                },
+                                                "count_people": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "user": {
+                                                    "description": "Объект пользователя",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "name"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "test@mail.ru"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "+79190945566"
+                                                        },
+                                                        "is_blocked": {
+                                                            "type": "boolean",
+                                                            "example": "false"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "example": "20.02.2026 18:00:12"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "table": {
+                                                    "description": "Объект столика",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "number": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "capacity_min": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "capacity_max": {
+                                                            "type": "integer",
+                                                            "example": "5"
+                                                        },
+                                                        "zone": {
+                                                            "type": "string",
+                                                            "example": "Терраса"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "example": "20.02.2026 18:00:12"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "restaurant": {
+                                                    "description": "Объект ресторана",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Тестовый ресторан"
+                                                        },
+                                                        "address": {
+                                                            "type": "string",
+                                                            "example": "Тестовый адрес"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "reminder_type": {
+                                                    "description": "Объект типа напоминания",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "1"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "1d"
+                                                        },
+                                                        "minutes": {
+                                                            "type": "integer",
+                                                            "example": "1440"
+                                                        },
+                                                        "is_default": {
+                                                            "type": "boolean",
+                                                            "example": "false"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "example": "20.02.2026 18:00:12"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "Pending"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/validation-error"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Validation Error"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Произошла одна или несколько ошибок проверки."
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/reservations/1"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Поле email обязательно для заполнения."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Нет прав",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "example": "https://example.com/errors/forbidden"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "You not authorized"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        },
+                                        "detail": {
+                                            "type": "string",
+                                            "example": "Доступ к ресурсу запрещен!"
+                                        },
+                                        "instance": {
+                                            "type": "string",
+                                            "example": "/api/reservations/1"
                                         }
                                     },
                                     "type": "object"

@@ -135,6 +135,7 @@ Route::middleware('throttle:api')->group(function (): void {
 
         Route::controller(ReservationController::class)->group(function () {
             Route::post('/reservations', 'store')->can('create', Reservation::class);
+            Route::patch('/reservations/{id}', 'update');
         });
     });
 

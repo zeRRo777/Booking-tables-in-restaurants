@@ -25,4 +25,14 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
             'status_id' => $status->id,
         ]);
     }
+
+    public function getById(int $id): Reservation|null
+    {
+        return Reservation::find($id);
+    }
+
+    public function update(Reservation $reservation, array $data): bool
+    {
+        return $reservation->update($data);
+    }
 }
