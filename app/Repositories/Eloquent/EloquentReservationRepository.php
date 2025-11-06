@@ -35,4 +35,9 @@ class EloquentReservationRepository implements ReservationRepositoryInterface
     {
         return $reservation->update($data);
     }
+
+    public function delete(Reservation $reservation): bool
+    {
+        return $reservation->forceDelete();
+    }
 }

@@ -28,4 +28,26 @@ class ReservationPolicy
 
         return false;
     }
+
+    public function view(User $user, Reservation $reservation): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        if ($user->hasRole('admin_restaurant')) {
+            return $reservation->restaurant()->administeredRestaurants()->where('user_id', $user->id)->exists();
+        }
+
+        return false;
+    }
+
+    public function delete(User $user, Reservation $reservation): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        return false;
+    }
 }

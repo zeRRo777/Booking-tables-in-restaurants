@@ -8,6 +8,7 @@ use App\Exceptions\NotFoundException;
 use App\Jobs\SendReservationReminder;
 use App\Models\Reservation;
 use App\Models\ScheduledReminder;
+use App\Notifications\ReservationDeletedNotification;
 use App\Notifications\ReservationStatusUpdatedNotification;
 use App\Notifications\SuccessReservationNotification;
 use App\Repositories\Contracts\ReservationRepositoryInterface;
@@ -105,5 +106,16 @@ class ReservationService
         });
 
         return $updatedReservation->load('reminderType', 'status', 'user', 'table', 'restaurant');
+    }
+
+    public function deleteReservation(Reservation $reservation): void
+    {
+        DB::transaction(function () use ($reservation) {
+            ScheduledReminder::where('reservation_id', $reservation->id)->delete();
+
+            $this->reservationRepository->delete($reservation);
+
+            $reservation->user->notify(new ReservationDeletedNotification($reservation));
+        });
     }
 }

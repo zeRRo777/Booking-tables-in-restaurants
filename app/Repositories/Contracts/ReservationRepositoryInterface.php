@@ -12,4 +12,6 @@ interface ReservationRepositoryInterface
     public function getById(int $id): ?Reservation;
 
     public function update(Reservation $reservation, array $data): bool;
+
+    public function delete(Reservation $reservation): bool;
 }
