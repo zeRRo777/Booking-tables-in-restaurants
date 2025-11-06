@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Reservation;
+use App\Models\Restaurant;
 use App\Models\User;
 
 class ReservationPolicy
@@ -46,6 +47,24 @@ class ReservationPolicy
     {
         if ($user->hasRole('superadmin')) {
             return true;
+        }
+
+        return false;
+    }
+
+    public function viewForUser(User $user, User $targetUser): bool
+    {
+        return $user->id === $targetUser->id;
+    }
+
+    public function viewForRestaurant(User $user, Restaurant $restaurant): bool
+    {
+        if ($user->hasRole('superadmin')) {
+            return true;
+        }
+
+        if ($user->hasRole('admin_restaurant')) {
+            return $restaurant->administrators()->where('user_id', $user->id)->exists();
         }
 
         return false;

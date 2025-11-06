@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Reservation\StoreRequest;
 use App\Http\Requests\Reservation\UpdateRequest;
+use App\Http\Requests\Reservation\ViewUserRequest;
+use App\Http\Resources\ReservationCollection;
 use App\Http\Resources\ReservationResource;
+use App\Models\Reservation;
 use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -419,5 +422,12 @@ class ReservationController extends Controller
         $this->reservationService->deleteReservation($reservation);
 
         return response()->json(null, 204);
+    }
+
+    public function reservertionForUser(ViewUserRequest $request): ReservationCollection
+    {
+        $user = $request->user();
+
+        Gate::authorize('viewForUser', [Reservation::class, $user]);
     }
 }
