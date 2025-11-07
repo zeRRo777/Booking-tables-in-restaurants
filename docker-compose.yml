@@ -5,7 +5,6 @@ services:
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: booking_tables
         extra_hosts:
             - "host.docker.internal:host-gateway"
         ports:

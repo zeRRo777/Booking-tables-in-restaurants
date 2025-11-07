@@ -3,16 +3,20 @@
 namespace App\Services;
 
 use App\DTOs\Reservation\CreateReservationDTO;
+use App\DTOs\Reservation\ListReservationDTO;
 use App\DTOs\Reservation\UpdateReservationDTO;
 use App\Exceptions\NotFoundException;
 use App\Jobs\SendReservationReminder;
 use App\Models\Reservation;
+use App\Models\Restaurant;
 use App\Models\ScheduledReminder;
+use App\Models\User;
 use App\Notifications\ReservationDeletedNotification;
 use App\Notifications\ReservationStatusUpdatedNotification;
 use App\Notifications\SuccessReservationNotification;
 use App\Repositories\Contracts\ReservationRepositoryInterface;
 use GrahamCampbell\ResultType\Success;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
@@ -117,5 +121,10 @@ class ReservationService
 
             $reservation->user->notify(new ReservationDeletedNotification($reservation));
         });
+    }
+
+    public function getReservations(ListReservationDTO $dto, User|Restaurant $scope): LengthAwarePaginator
+    {
+        return $this->reservationRepository->list($dto, $scope);
     }
 }

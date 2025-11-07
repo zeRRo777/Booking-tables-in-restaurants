@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Reservation\StoreRequest;
 use App\Http\Requests\Reservation\UpdateRequest;
+use App\Http\Requests\Reservation\ViewRestaurantRequest;
 use App\Http\Requests\Reservation\ViewUserRequest;
 use App\Http\Resources\ReservationCollection;
 use App\Http\Resources\ReservationResource;
 use App\Models\Reservation;
 use App\Services\ReservationService;
+use App\Services\RestaurantService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +25,7 @@ class ReservationController extends Controller
 {
     public function __construct(
         protected ReservationService $reservationService,
+        protected RestaurantService $restaurantService
     ) {}
 
 
@@ -424,10 +427,358 @@ class ReservationController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * @OA\Get(
+     * path="/me/reservations",
+     * tags={"Reservations"},
+     * summary="Получить список бронирований текущего пользователя",
+     * description="Получить список бронирований текущего пользователя",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="restaurant",
+     * in="query",
+     * description="Поиск по названию",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="date_from",
+     * in="query",
+     * description="Поиск по дате от",
+     * required=false,
+     * @OA\Schema(type="string", example="01.01.2026")
+     * ),
+     * @OA\Parameter(
+     * name="date_to",
+     * in="query",
+     * description="Поиск по дате до",
+     * required=false,
+     * @OA\Schema(type="string", example="01.01.2026")
+     * ),
+     * @OA\Parameter(
+     * name="status",
+     * in="query",
+     * description="Поиск по cтатусу бронирования",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"Pending", "Confirmed", "Cancelled", "Seated", "Completed", "No-show"},
+     * default="Pending"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={ "created_at", "starts_at"},
+     * default="created_at"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка бронирований",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив бронирований",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="start_at", type="string", example="28.02.2026 18:00"),
+     * @OA\Property(property="ends_at", type="string", example="28.02.2026 20:00"),
+     * @OA\Property(property="special_wish", type="string", example="special_wish"),
+     * @OA\Property(property="count_people", type="integer", example="1"),
+     * @OA\Property(
+     * property="user",
+     * type="object",
+     * description="Объект пользователя",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="name"),
+     * @OA\Property(property="email", type="string", example="test@mail.ru"),
+     * @OA\Property(property="phone", type="string", example="+79190945566"),
+     * @OA\Property(property="is_blocked", type="boolean", example="false"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(
+     * property="table",
+     * type="object",
+     * description="Объект столика",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="number", type="integer", example="1"),
+     * @OA\Property(property="capacity_min", type="integer", example="1"),
+     * @OA\Property(property="capacity_max", type="integer", example="5"),
+     * @OA\Property(property="zone", type="string", example="Терраса"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(
+     * property="restaurant",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * ),
+     * @OA\Property(
+     * property="reminder_type",
+     * type="object",
+     * description="Объект типа напоминания",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="1d"),
+     * @OA\Property(property="minutes", type="integer", example="1440"),
+     * @OA\Property(property="is_default", type="boolean", example="false"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(property="status", type="string", example="Pending"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/api/me/reservations")
+     * )
+     * ),
+     * )
+     */
     public function reservertionForUser(ViewUserRequest $request): ReservationCollection
     {
         $user = $request->user();
 
         Gate::authorize('viewForUser', [Reservation::class, $user]);
+
+        $dto = $request->toDto();
+
+        $reservations = $this->reservationService->getReservations($dto, $user);
+
+        return new ReservationCollection($reservations);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/restaurants/{id}/reservations",
+     * tags={"Reservations"},
+     * summary="Получить список бронирований для ресторана",
+     * description="Получить список бронирований для ресторана",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="date_from",
+     * in="query",
+     * description="Поиск по дате от",
+     * required=false,
+     * @OA\Schema(type="string", example="01.01.2026")
+     * ),
+     * @OA\Parameter(
+     * name="date_to",
+     * in="query",
+     * description="Поиск по дате до",
+     * required=false,
+     * @OA\Schema(type="string", example="01.01.2026")
+     * ),
+     * @OA\Parameter(
+     * name="table_number",
+     * in="query",
+     * description="Поиск по номеру стола",
+     * required=false,
+     * @OA\Schema(type="integer", example="1")
+     * ),
+     * @OA\Parameter(
+     * name="table_zone",
+     * in="query",
+     * description="Поиск по зоне столика",
+     * required=false,
+     * @OA\Schema(type="string", example="Веранда")
+     * ),
+     * @OA\Parameter(
+     * name="status",
+     * in="query",
+     * description="Поиск по cтатусу бронирования",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"Pending", "Confirmed", "Cancelled", "Seated", "Completed", "No-show"},
+     * default="Pending"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={ "created_at", "starts_at"},
+     * default="created_at"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка бронирований",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив бронирований",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="start_at", type="string", example="28.02.2026 18:00"),
+     * @OA\Property(property="ends_at", type="string", example="28.02.2026 20:00"),
+     * @OA\Property(property="special_wish", type="string", example="special_wish"),
+     * @OA\Property(property="count_people", type="integer", example="1"),
+     * @OA\Property(
+     * property="user",
+     * type="object",
+     * description="Объект пользователя",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="name"),
+     * @OA\Property(property="email", type="string", example="test@mail.ru"),
+     * @OA\Property(property="phone", type="string", example="+79190945566"),
+     * @OA\Property(property="is_blocked", type="boolean", example="false"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(
+     * property="table",
+     * type="object",
+     * description="Объект столика",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="number", type="integer", example="1"),
+     * @OA\Property(property="capacity_min", type="integer", example="1"),
+     * @OA\Property(property="capacity_max", type="integer", example="5"),
+     * @OA\Property(property="zone", type="string", example="Терраса"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(
+     * property="restaurant",
+     * type="object",
+     * description="Объект ресторана",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="Тестовый ресторан"),
+     * @OA\Property(property="address", type="string", example="Тестовый адрес"),
+     * ),
+     * @OA\Property(
+     * property="reminder_type",
+     * type="object",
+     * description="Объект типа напоминания",
+     * @OA\Property(property="id", type="integer", example="1"),
+     * @OA\Property(property="name", type="string", example="1d"),
+     * @OA\Property(property="minutes", type="integer", example="1440"),
+     * @OA\Property(property="is_default", type="boolean", example="false"),
+     * @OA\Property(property="created_at", type="string", example="20.02.2026 18:00:12"),
+     * ),
+     * @OA\Property(property="status", type="string", example="Pending"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * ),
+     * @OA\Response(
+     * response=403,
+     * description="Нет прав",
+     * @OA\JsonContent(
+     * @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     * @OA\Property(property="title", type="string", example="You not authorized"),
+     * @OA\Property(property="status", type="integer", example=403),
+     * @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     * @OA\Property(property="instance", type="string", example="/restaurants/1/reservations")
+     * )
+     * ),
+     * )
+     */
+    public function reservationForRestaurant(ViewRestaurantRequest $request, int $id): ReservationCollection
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('viewForRestaurant', [Reservation::class, $restaurant]);
+
+        $dto = $request->toDto();
+
+        $reservations = $this->reservationService->getReservations($dto, $restaurant);
+
+        return new ReservationCollection($reservations);
     }
 }

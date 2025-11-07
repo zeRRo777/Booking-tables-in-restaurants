@@ -2,13 +2,12 @@
 
 namespace App\Http\Requests\Reservation;
 
-use App\DTOs\Reservation\ListReservationForUserDTO;
+use App\DTOs\Reservation\ListReservationForRestaurantDTO;
 use App\Models\ReservationStatuse;
-use App\Models\Restaurant;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ViewUserRequest extends FormRequest
+class ViewRestaurantRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,27 +26,23 @@ class ViewUserRequest extends FormRequest
     {
         return [
             'status' => ['sometimes', 'string', 'exists:reservation_statuses,name'],
-            'restaurant' => ['sometimes', 'string', 'exists:restaurants,name'],
             'date_from' => ['sometimes', 'date_format:d.m.Y'],
             'date_to' => ['sometimes', 'date_format:d.m.Y', 'after_or_equal:date_from'],
             'sort_by' => ['sometimes', 'string', Rule::in(['starts_at', 'created_at'])],
             'sort_direction' => ['sometimes', 'string', Rule::in(['asc', 'desc'])],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'table_number' => ['sometimes', 'integer', 'min:1'],
+            'table_zone' => ['sometimes', 'string', 'max:255'],
         ];
     }
 
-    public function toDto(): ListReservationForUserDTO
+    public function toDto(): ListReservationForRestaurantDTO
     {
         $dataValidated = $this->validated();
-
-        if (isset($dataValidated['restaurant'])) {
-            $dataValidated['restaurant'] = Restaurant::where('name', $dataValidated['restaurant'])->first()->id;
-        }
 
         if (isset($dataValidated['status'])) {
             $dataValidated['status'] = ReservationStatuse::where('name', $dataValidated['status'])->first()->id;
         }
-
-        return ListReservationForUserDTO::from($dataValidated);
+        return ListReservationForRestaurantDTO::from($dataValidated);
     }
 }

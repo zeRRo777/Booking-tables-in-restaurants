@@ -138,6 +138,8 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::patch('/reservations/{id}', 'update');
             Route::get('/reservations/{id}', 'show');
             Route::delete('/reservations/{id}', 'destroy');
+            Route::get('/me/reservations', 'reservertionForUser');
+            Route::get('/restaurants/{id}/reservations', 'reservationForRestaurant');
         });
     });
 
