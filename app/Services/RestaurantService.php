@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\Restaurant\AvailabilityRestaurantDTO;
 use App\DTOs\Restaurant\BlockedUserFilterDTO;
 use App\DTOs\Restaurant\ChangeStatusDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
@@ -223,5 +224,14 @@ class RestaurantService
     public function deleteBlockedUser(DeleteUserRestaurantBlockedDTO $dto, bool $real = false): void
     {
         $this->userRestaurantStatuseRepository->delete($dto, $real);
+    }
+
+    public function checkAvailability(AvailabilityRestaurantDTO $dto): LengthAwarePaginator
+    {
+        $reservationDurationInHours = 2;
+        $reservationStart = $dto->date->setTimeFrom($dto->time);
+        $reservationEnd = $reservationStart->copy()->addHours($reservationDurationInHours);
+
+        return $this->restaurantRepository->findAvailableTables($reservationStart, $reservationEnd, $dto);
     }
 }

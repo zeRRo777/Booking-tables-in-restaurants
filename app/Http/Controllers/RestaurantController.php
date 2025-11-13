@@ -9,6 +9,7 @@ use App\Http\Requests\Restaurant\Blocked\DeleteRequest as BlockedDeleteRequest;
 use App\Http\Requests\Restaurant\Blocked\IndexRequest as BlockedIndexRequest;
 use App\Http\Requests\Restaurant\Blocked\StoreRequest as BlockedStoreRequest;
 use App\Http\Requests\Restaurant\ChangeStatusRequest;
+use App\Http\Requests\Restaurant\CheckAvailabilityRequest;
 use App\Http\Requests\Restaurant\IndexRequest;
 use App\Http\Requests\Restaurant\Schedules\DeleteRequest;
 use App\Http\Requests\Restaurant\Schedules\IndexRequest as SchedulesIndexRequest;
@@ -23,6 +24,7 @@ use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Http\Resources\RestaurantScheduleCollection;
 use App\Http\Resources\RestaurantScheduleResource;
+use App\Http\Resources\TableCollection;
 use App\Http\Resources\UserCollection;
 use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
@@ -1831,5 +1833,124 @@ class RestaurantController extends Controller
         $this->restaurantService->deleteBlockedUser($dto, true);
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/restaurants/{id}/availability",
+     * tags={"Restaurants"},
+     * summary="Получение списка свободных столиков в ресторане",
+     * description="Получение списка свободных столиков в ресторане",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * description="ID ресторана для получения",
+     * required=true,
+     * @OA\Schema(
+     * type="integer",
+     * example=1
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="zone",
+     * in="query",
+     * description="Поиск по зоне столика",
+     * required=false,
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="date",
+     * in="query",
+     * description="Поиск по дате",
+     * required=true,
+     * @OA\Schema(type="string", example="2025-11-14")
+     * ),
+     * @OA\Parameter(
+     * name="time",
+     * in="query",
+     * description="Поиск по времени",
+     * required=true,
+     * @OA\Schema(type="string", example="18:00")
+     * ),
+     * @OA\Parameter(
+     * name="count_guests",
+     * in="query",
+     * description="Поиск по количесву гостей",
+     * required=false,
+     * @OA\Schema(type="integer", example="1")
+     * ),
+     * @OA\Parameter(
+     * name="sort_by",
+     * in="query",
+     * description="Поле сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"number"},
+     * default="number"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="sort_direction",
+     * in="query",
+     * description="Направление сортировки",
+     * required=false,
+     * @OA\Schema(
+     * type="string",
+     * enum={"asc", "desc"},
+     * default="asc"
+     * )
+     * ),
+     * @OA\Parameter(
+     * name="page",
+     * in="query",
+     * description="Номер страницы",
+     * required=false,
+     * @OA\Schema(type="integer", default=1)
+     * ),
+     * @OA\Parameter(
+     * name="per_page",
+     * in="query",
+     * description="Количество элементов на странице",
+     * required=false,
+     * @OA\Schema(type="integer", default=10)
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Успешное получение списка столиков в ресторане",
+     * @OA\JsonContent(
+     * @OA\Property(
+     * property="data",
+     * type="array",
+     * description="Массив столиков в ресторане",
+     * @OA\Items(
+     * @OA\Property(property="id", type="integer", example=1),
+     * @OA\Property(property="number", type="integer", example=1),
+     * @OA\Property(property="capacity_min", type="integer", example=1),
+     * @OA\Property(property="capacity_max", type="integer", example=1),
+     * @OA\Property(property="zone", type="string", example="Тестовая зона"),
+     * ),
+     * ),
+     * @OA\Property(
+     * property="meta",
+     * type="object",
+     * description="Пагинация",
+     * @OA\Property(property="total", type="integer", example=56),
+     * @OA\Property(property="per_page", type="integer", example=10),
+     * @OA\Property(property="current_page", type="integer", example=1),
+     * @OA\Property(property="count_pages", type="integer", example=6),
+     * ),
+     * )
+     * )
+     * )
+     */
+    public function checkAvailability(CheckAvailabilityRequest $request, int $id): TableCollection
+    {
+        $dto = $request->toDto();
+
+        $tables = $this->restaurantService->checkAvailability($dto);
+
+        return new TableCollection($tables);
     }
 }

@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1/api",
+            "url": "http://localhost/api",
             "description": "API Server"
         }
     ],
@@ -8737,6 +8737,184 @@
                                         "instance": {
                                             "type": "string",
                                             "example": "/restaurants/1/blocked-users/1"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/restaurants/{id}/availability": {
+            "get": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Получение списка свободных столиков в ресторане",
+                "description": "Получение списка свободных столиков в ресторане",
+                "operationId": "1eb8f002f94634ca00b0cb7d8b77fb48",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID ресторана для получения",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "zone",
+                        "in": "query",
+                        "description": "Поиск по зоне столика",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Поиск по дате",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "2025-11-14"
+                        }
+                    },
+                    {
+                        "name": "time",
+                        "in": "query",
+                        "description": "Поиск по времени",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "18:00"
+                        }
+                    },
+                    {
+                        "name": "count_guests",
+                        "in": "query",
+                        "description": "Поиск по количесву гостей",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Поле сортировки",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "number",
+                            "enum": [
+                                "number"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Направление сортировки",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Номер страницы",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Количество элементов на странице",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение списка столиков в ресторане",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Массив столиков в ресторане",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "number": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "capacity_min": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "capacity_max": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "zone": {
+                                                        "type": "string",
+                                                        "example": "Тестовая зона"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Пагинация",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 56
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "count_pages": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

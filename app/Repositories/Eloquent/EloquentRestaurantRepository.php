@@ -2,11 +2,15 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\DTOs\Restaurant\AvailabilityRestaurantDTO;
 use App\DTOs\Restaurant\CreateRestaurantDTO;
 use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
+use App\Models\Reservation;
 use App\Models\Restaurant;
 use App\Models\RestaurantStatuse;
+use App\Models\Table;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -87,5 +91,37 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
     public function getAllAdmins(Restaurant $restaurant): Collection
     {
         return $restaurant->administrators;
+    }
+
+    public function findAvailableTables(Carbon $startTime, Carbon $endTime, AvailabilityRestaurantDTO $dto): LengthAwarePaginator
+    {
+        $busyTableIds = Reservation::query()
+            ->where('restaurant_id', $dto->restaurant_id)
+            ->where(function (Builder $query) use ($startTime, $endTime) {
+                $query->where('starts_at', '<', $endTime)
+                    ->where('ends_at', '>', $startTime);
+            })
+            ->whereHas('status', function (Builder $query) {
+                $query->whereNotIn('name', ['Cancelled', 'No-show']);
+            })
+            ->pluck('table_id')
+            ->unique();
+
+        $availableTablesQuery = Table::query()
+            ->where('restaurant_id', $dto->restaurant_id)
+            ->whereNotIn('id', $busyTableIds);
+
+        $availableTablesQuery->when($dto->count_guests, function (Builder $query, $countGuests) {
+            $query->where('capacity_min', '<=', $countGuests)
+                ->where('capacity_max', '>=', $countGuests);
+        });
+
+        $availableTablesQuery->when($dto->zone, function (Builder $query, $zone) {
+            $query->where('zone', $zone);
+        });
+
+        $availableTablesQuery->orderBy($dto->sort_by, $dto->sort_direction);
+
+        return $availableTablesQuery->paginate($dto->per_page);
     }
 }
