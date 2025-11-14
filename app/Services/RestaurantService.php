@@ -13,6 +13,7 @@ use App\DTOs\Restaurant\DeleteUserRestaurantBlockedDTO;
 use App\DTOs\Restaurant\RestaurantFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleFilterDTO;
 use App\DTOs\Restaurant\RestaurantScheduleShowDTO;
+use App\DTOs\Restaurant\RestaurantStatsDTO;
 use App\DTOs\Restaurant\UpdateRestaurantDTO;
 use App\DTOs\Restaurant\UpdateRestaurantScheduleDTO;
 use App\DTOs\User\CreateUserDTO;
@@ -28,6 +29,7 @@ use App\Repositories\Contracts\RestaurantRepositoryInterface;
 use App\Repositories\Contracts\RestaurantScheduleRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\UserRestaurantStatuseRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -233,5 +235,38 @@ class RestaurantService
         $reservationEnd = $reservationStart->copy()->addHours($reservationDurationInHours);
 
         return $this->restaurantRepository->findAvailableTables($reservationStart, $reservationEnd, $dto);
+    }
+
+    public function getStats(Restaurant $restaurant, RestaurantStatsDTO $dto): array
+    {
+        return match ($dto->period) {
+            'day' => $this->getDayStats($restaurant->id, $dto->date),
+            'month' => $this->getMonthStats($restaurant->id, $dto->date),
+            'year' => $this->getYearStats($restaurant->id, $dto->date),
+        };
+    }
+
+    private function getDayStats(int $restaurantId, Carbon $date): array
+    {
+        return [
+            'summary' => $this->restaurantRepository->getDailySummary($restaurantId, $date),
+            'details' => $this->restaurantRepository->getDailyStats($restaurantId, $date),
+        ];
+    }
+
+    private function getMonthStats(int $restaurantId, Carbon $date): array
+    {
+        return [
+            'summary' => $this->restaurantRepository->getMonthlySummary($restaurantId, $date->year, $date->month),
+            'details' => $this->restaurantRepository->getMonthlyStats($restaurantId, $date->year, $date->month),
+        ];
+    }
+
+    private function getYearStats(int $restaurantId, Carbon $date): array
+    {
+        return [
+            'summary' => $this->restaurantRepository->getYearlySummary($restaurantId, $date->year),
+            'details' => $this->restaurantRepository->getYearlyStats($restaurantId, $date->year),
+        ];
     }
 }

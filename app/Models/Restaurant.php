@@ -42,11 +42,6 @@ class Restaurant extends Model
         return $this->belongsToMany(User::class, 'restaurant_admins');
     }
 
-    public function occupancyStats(): HasMany
-    {
-        return $this->hasMany(OccupancyStat::class);
-    }
-
     public function schedules(): HasMany
     {
         return $this->hasMany(RestaurantSchedule::class);

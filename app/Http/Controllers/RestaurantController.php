@@ -16,10 +16,12 @@ use App\Http\Requests\Restaurant\Schedules\IndexRequest as SchedulesIndexRequest
 use App\Http\Requests\Restaurant\Schedules\ShowRequest;
 use App\Http\Requests\Restaurant\Schedules\StoreRequest as SchedulesStoreRequest;
 use App\Http\Requests\Restaurant\Schedules\UpdateRequest as SchedulesUpdateRequest;
+use App\Http\Requests\Restaurant\StatRequest;
 use App\Http\Requests\Restaurant\StoreRequest;
 use App\Http\Requests\Restaurant\UpdateRequest;
 use App\Http\Resources\BlockedUserCollection;
 use App\Http\Resources\BlockedUserResource;
+use App\Http\Resources\OccupancyStatsResource;
 use App\Http\Resources\RestaurantCollection;
 use App\Http\Resources\RestaurantResource;
 use App\Http\Resources\RestaurantScheduleCollection;
@@ -1952,5 +1954,118 @@ class RestaurantController extends Controller
         $tables = $this->restaurantService->checkAvailability($dto);
 
         return new TableCollection($tables);
+    }
+
+    /**
+     * @OA\GET(
+     *     path="/restaurants/{id}/occupancy-stats",
+     *     tags={"Restaurants"},
+     *     summary="Получение статистики ресторана по id",
+     *     description="Получение статистики ресторана по id",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID ресторана для получения",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="period",
+     *         in="query",
+     *         description="Период",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"day", "month", "year"},
+     *             default="day"
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="date",
+     *         in="query",
+     *         description="Дата",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="2025-11-14"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Успешное получение статистики ресторана",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 description="Объект статистики",
+     *                 @OA\Property(property="restaurant_id", type="integer", example=1),
+     *                 @OA\Property(property="period", type="string", example="day"),
+     *                 @OA\Property(property="date", type="string", example="2025-10-12"),
+     *                 @OA\Property(
+     *                     property="summary",
+     *                     type="object",
+     *                     @OA\Property(property="total_reservations", type="integer", example=10),
+     *                     @OA\Property(property="total_guests", type="integer", example=10),
+     *                     @OA\Property(property="average_occupancy_percent", type="integer", example=50),
+     *                     @OA\Property(property="peak_hour", type="string", example="18:00"),
+     *                     @OA\Property(property="off_peak_hour", type="string", example="16:00")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="details",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="hour", type="string", example="16:00"),
+     *                         @OA\Property(property="occupancy_percent", type="integer", example=50),
+     *                         @OA\Property(property="reservations_count", type="integer", example=10),
+     *                         @OA\Property(property="guests_count", type="integer", example=20)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Нет прав",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="type", type="string", example="https://example.com/errors/forbidden"),
+     *             @OA\Property(property="title", type="string", example="You not authorized"),
+     *             @OA\Property(property="status", type="integer", example=403),
+     *             @OA\Property(property="detail", type="string", example="Доступ к ресурсу запрещен!"),
+     *             @OA\Property(property="instance", type="string", example="/api/restaurants/1/occupancy-stats")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Ресторан не найден",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="type", type="string", example="https://example.com/errors/not-found"),
+     *             @OA\Property(property="title", type="string", example="Object Not Found"),
+     *             @OA\Property(property="status", type="integer", example=404),
+     *             @OA\Property(property="detail", type="string", example="Ресторан не найден!"),
+     *             @OA\Property(property="instance", type="string", example="/api/restaurants/1/occupancy-stats")
+     *         )
+     *     )
+     * )
+     */
+    public function getStats(StatRequest $request, int $id): OccupancyStatsResource
+    {
+        $restaurant = $this->restaurantService->getRestaurant($id);
+
+        Gate::authorize('viewStats', $restaurant);
+
+        $dto = $request->toDto();
+
+        $statsData = $this->restaurantService->getStats($restaurant, $dto);
+
+        return new OccupancyStatsResource(
+            $statsData,
+            $restaurant->id,
+            $dto->period,
+            $dto->date
+        );
     }
 }

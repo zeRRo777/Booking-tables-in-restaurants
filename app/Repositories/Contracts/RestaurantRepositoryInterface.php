@@ -26,4 +26,11 @@ interface RestaurantRepositoryInterface
     public function getAllAdmins(Restaurant $restaurant): Collection;
 
     public function findAvailableTables(Carbon $startTime, Carbon $endTime, AvailabilityRestaurantDTO $dto): LengthAwarePaginator;
+
+    public function getDailyStats(int $restaurantId, Carbon $date): Collection;
+    public function getMonthlyStats(int $restaurantId, int $year, int $month): Collection;
+    public function getYearlyStats(int $restaurantId, int $year): Collection;
+    public function getDailySummary(int $restaurantId, Carbon $date): ?object;
+    public function getMonthlySummary(int $restaurantId, int $year, int $month): ?object;
+    public function getYearlySummary(int $restaurantId, int $year): ?object;
 }

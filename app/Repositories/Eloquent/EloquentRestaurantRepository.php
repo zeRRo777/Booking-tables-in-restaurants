@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class EloquentRestaurantRepository implements RestaurantRepositoryInterface
 {
@@ -123,5 +124,58 @@ class EloquentRestaurantRepository implements RestaurantRepositoryInterface
         $availableTablesQuery->orderBy($dto->sort_by, $dto->sort_direction);
 
         return $availableTablesQuery->paginate($dto->per_page);
+    }
+
+    public function getDailyStats(int $restaurantId, Carbon $date): Collection
+    {
+        return DB::table('hourly_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->whereDate('date', $date)
+            ->orderBy('hour')
+            ->get();
+    }
+
+    public function getMonthlyStats(int $restaurantId, int $year, int $month): Collection
+    {
+        return DB::table('daily_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date')
+            ->get();
+    }
+
+    public function getYearlyStats(int $restaurantId, int $year): Collection
+    {
+        return DB::table('monthly_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->where('year', $year)
+            ->orderBy('month')
+            ->get();
+    }
+
+    public function getDailySummary(int $restaurantId, Carbon $date): ?object
+    {
+        return DB::table('daily_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->whereDate('date', $date)
+            ->first();
+    }
+
+    public function getMonthlySummary(int $restaurantId, int $year, int $month): ?object
+    {
+        return DB::table('monthly_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+    }
+
+    public function getYearlySummary(int $restaurantId, int $year): ?object
+    {
+        return DB::table('yearly_occupancy_stats')
+            ->where('restaurant_id', $restaurantId)
+            ->where('year', $year)
+            ->first();
     }
 }

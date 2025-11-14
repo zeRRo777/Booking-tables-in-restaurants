@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\AggregateRestaurantStats;
 use App\Console\Commands\PruneOldRestaurantSchedules;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -11,3 +12,5 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command(PruneOldRestaurantSchedules::class)->daily();
+
+Schedule::command(AggregateRestaurantStats::class)->dailyAt('23:45');
