@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/api",
+            "url": "http://127.0.0.1/api",
             "description": "API Server"
         }
     ],
