@@ -28,7 +28,6 @@ use App\Http\Resources\RestaurantScheduleCollection;
 use App\Http\Resources\RestaurantScheduleResource;
 use App\Http\Resources\TableCollection;
 use App\Http\Resources\UserCollection;
-use App\Models\Restaurant;
 use App\Models\RestaurantSchedule;
 use App\Services\RestaurantService;
 use App\Services\UserService;

@@ -12,7 +12,6 @@ use App\Models\Reservation;
 use App\Services\ReservationService;
 use App\Services\RestaurantService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
